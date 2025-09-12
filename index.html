@@ -6,63 +6,65 @@
     <title>Hospital Appointment Reminder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icon Library -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-slate-50 text-slate-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         <!-- Header -->
-        <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">Hospital Appointment Reminder</h1>
-            <p class="text-gray-500 mt-2">Never miss an important consultation again.</p>
+        <header class="text-center mb-10 md:mb-14">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-700">Hospital Appointment Reminder</h1>
+            <p class="text-slate-500 mt-2 text-lg">Never miss an important consultation again.</p>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column: Add Appointment & Calendar -->
             <div class="lg:col-span-1 space-y-8">
                 <!-- Add Appointment Form -->
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Set a New Reminder</h2>
-                    <form id="appointmentForm" class="space-y-4">
+                <div class="card">
+                    <h2 class="card-header">Set a New Reminder</h2>
+                    <form id="appointmentForm" class="space-y-4 p-6">
                         <div>
-                            <label for="patientName" class="text-sm font-medium text-gray-600">Patient Name</label>
-                            <input type="text" id="patientName" name="patientName" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="patientName" class="form-label">Patient Name</label>
+                            <input type="text" id="patientName" name="patientName" required class="form-input">
                         </div>
                         <div>
-                            <label for="doctorName" class="text-sm font-medium text-gray-600">Doctor's Name</label>
-                            <input type="text" id="doctorName" name="doctorName" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="doctorName" class="form-label">Doctor's Name</label>
+                            <input type="text" id="doctorName" name="doctorName" required class="form-input">
                         </div>
                         <div>
-                            <label for="appointmentDate" class="text-sm font-medium text-gray-600">Appointment Date</label>
-                            <input type="date" id="appointmentDate" name="appointmentDate" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="appointmentDate" class="form-label">Appointment Date</label>
+                            <input type="date" id="appointmentDate" name="appointmentDate" required class="form-input">
                         </div>
                          <div>
-                            <label for="appointmentTime" class="text-sm font-medium text-gray-600">Appointment Time</label>
-                            <input type="time" id="appointmentTime" name="appointmentTime" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="appointmentTime" class="form-label">Appointment Time</label>
+                            <input type="time" id="appointmentTime" name="appointmentTime" required class="form-input">
                         </div>
                         <div>
-                            <label for="notes" class="text-sm font-medium text-gray-600">Notes / Reason for Visit</label>
-                            <textarea id="notes" name="notes" rows="3" class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="e.g., Annual Checkup"></textarea>
+                            <label for="notes" class="form-label">Notes / Reason for Visit</label>
+                            <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="e.g., Annual Checkup"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105">
+                        <button type="submit" class="submit-btn">
+                            <i data-lucide="bell-plus" class="w-5 h-5 mr-2"></i>
                             Set Reminder
                         </button>
                     </form>
                 </div>
 
                 <!-- Mini Calendar -->
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <div id="calendar" class="space-y-4">
+                <div class="card">
+                    <div id="calendar" class="space-y-4 p-6">
                         <div class="flex items-center justify-between">
-                            <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">&lt;</button>
-                            <h3 id="monthYear" class="text-lg font-semibold"></h3>
-                            <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">&gt;</button>
+                            <button id="prevMonth" class="nav-btn">&lt;</button>
+                            <h3 id="monthYear" class="text-lg font-semibold text-slate-600"></h3>
+                            <button id="nextMonth" class="nav-btn">&gt;</button>
                         </div>
-                        <div class="grid calendar-grid text-center text-sm font-medium text-gray-500">
+                        <div class="calendar-grid text-center text-sm font-semibold text-slate-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="grid calendar-grid text-center">
+                        <div id="calendarDays" class="calendar-grid text-center">
                             <!-- Calendar days will be generated here -->
                         </div>
                     </div>
@@ -71,19 +73,17 @@
 
             <!-- Right Column: Upcoming Appointments -->
             <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-2xl shadow-md min-h-full">
-                    <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-3">Upcoming Appointments</h2>
-                    <div id="appointmentList" class="space-y-4">
+                <div class="card min-h-full">
+                    <h2 class="card-header">Upcoming Appointments</h2>
+                    <div id="appointmentList" class="p-6 space-y-4">
                         <!-- Appointments will be rendered here -->
-                        <div id="loadingState" class="text-center py-10">
-                            <p class="text-gray-500">Loading appointments...</p>
+                        <div id="loadingState" class="feedback-state">
+                            <p>Loading appointments...</p>
                         </div>
-                         <div id="emptyState" class="hidden text-center py-10 px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <h3 class="mt-2 text-lg font-medium text-gray-900">No appointments scheduled</h3>
-                            <p class="mt-1 text-sm text-gray-500">Use the form on the left to add a new reminder.</p>
+                         <div id="emptyState" class="hidden feedback-state">
+                            <i data-lucide="calendar-off" class="w-12 h-12 text-slate-300"></i>
+                            <h3 class="mt-2 text-lg font-medium text-slate-800">No appointments scheduled</h3>
+                            <p class="mt-1 text-sm text-slate-500">Use the form on the left to add a new reminder.</p>
                         </div>
                     </div>
                 </div>
@@ -93,6 +93,9 @@
 
     <!-- App Logic -->
     <script src="script.js"></script>
+    <script>
+      lucide.createIcons(); // Initialize icons
+    </script>
 </body>
 </html>
 
