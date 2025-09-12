@@ -1,0 +1,27 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+.calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.calendar-day.has-appointment {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    position: relative;
+}
+ .calendar-day.has-appointment::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background-color: #ef4444;
+    border-radius: 50%;
+ }
+.calendar-day.today {
+    background-color: #e0e7ff;
+    border-radius: 50%;
+}
+
