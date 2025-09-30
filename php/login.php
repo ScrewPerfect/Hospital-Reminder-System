@@ -1,60 +1,57 @@
 <?php
-// File: login.php
+// File: php/login.php
+error_reporting(0); // Suppress notices for older PHP versions
 
-// Suppress notices and warnings to ensure a clean JSON response
-error_reporting(0);
-
-// 1. Start the session
-session_start();
-
-// 2. Include the database connection
 require_once 'db_connect.php';
 
-// 3. Set the content type to JSON
+// Always start the session at the very beginning
+session_start();
+
 header('Content-Type: application/json');
 
-// 4. Get the input from the form (compatible with older PHP)
-$username = isset($_POST['username']) ? $_POST['username'] : '';
+$response = array('success' => false, 'message' => 'An unknown error occurred.');
+
+$username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
 
-// 5. Basic validation
 if (empty($username) || empty($password)) {
-    echo json_encode(['success' => false, 'message' => 'Username and password are required.']);
+    $response['message'] = 'Please enter both username and password.';
+    echo json_encode($response);
     exit();
 }
 
-// 6. Find the user in the database
-$sql = "SELECT id, password FROM users WHERE username = ?";
-$stmt = $conn->prepare($sql);
+// Prepare statement to prevent SQL injection
+$stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
 if ($stmt === false) {
-    echo json_encode(['success' => false, 'message' => 'Database prepare error.']);
+    $response['message'] = 'Database prepare statement failed.';
+     echo json_encode($response);
     exit();
 }
+
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
-    // User found, now verify password
     $user = $result->fetch_assoc();
-    
+    // Verify the password against the stored hash
     if (password_verify($password, $user['password'])) {
-        // Password is correct, login successful
+        // Password is correct, set session variables
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $username;
         
-        echo json_encode(['success' => true]);
+        $response['success'] = true;
+        $response['message'] = 'Login successful!';
     } else {
-        // Incorrect password
-        echo json_encode(['success' => false, 'message' => 'Invalid username or password.']);
+        $response['message'] = 'Invalid username or password.';
     }
 } else {
-    // User not found
-    echo json_encode(['success' => false, 'message' => 'Invalid username or password.']);
+    $response['message'] = 'Invalid username or password.';
 }
 
-// 7. Close connections
 $stmt->close();
 $conn->close();
+
+echo json_encode($response);
 ?>
 
