@@ -94,6 +94,43 @@
             </div>
         </main>
     </div>
+    
+    <!-- Edit Appointment Modal -->
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-xl font-semibold">Edit Appointment</h2>
+                <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <form id="editAppointmentForm" class="space-y-4 mt-4">
+                <input type="hidden" id="editAppointmentId" name="id">
+                <div>
+                    <label for="editPatientName" class="text-sm font-medium text-gray-600 mb-1 block">Patient Name</label>
+                    <input type="text" id="editPatientName" name="patient_name" required class="form-input">
+                </div>
+                <div>
+                    <label for="editDoctorName" class="text-sm font-medium text-gray-600 mb-1 block">Doctor's Name</label>
+                    <input type="text" id="editDoctorName" name="doctor_name" required class="form-input">
+                </div>
+                <div>
+                    <label for="editAppointmentDate" class="text-sm font-medium text-gray-600 mb-1 block">Appointment Date</label>
+                    <input type="date" id="editAppointmentDate" name="date" required class="form-input">
+                </div>
+                <div>
+                    <label for="editAppointmentTime" class="text-sm font-medium text-gray-600 mb-1 block">Appointment Time</label>
+                    <input type="time" id="editAppointmentTime" name="time" required class="form-input">
+                </div>
+                <div>
+                    <label for="editNotes" class="text-sm font-medium text-gray-600 mb-1 block">Notes / Reason for Visit</label>
+                    <textarea id="editNotes" name="notes" rows="3" class="form-input"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
     <script>
