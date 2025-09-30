@@ -1,6 +1,9 @@
 <?php
 // File: login.php
 
+// Suppress notices and warnings to ensure a clean JSON response
+error_reporting(0);
+
 // 1. Start the session
 session_start();
 
@@ -33,7 +36,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     // User found, now verify password
-    $user = $result->fetch_assoc();
+    $user = result->fetch_assoc();
     
     if (password_verify($password, $user['password'])) {
         // Password is correct, login successful
@@ -55,4 +58,3 @@ $stmt->close();
 $conn->close();
 ?>
 
-1
