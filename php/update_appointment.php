@@ -16,8 +16,9 @@ $time = isset($_POST['time']) ? $_POST['time'] : null;
 $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
 $user_id = $_SESSION['user_id'];
 
+// Ensure all fields required for an update are present
 if (!$id || !$patient_name || !$doctor_name || !$date || !$time) {
-    echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
+    echo json_encode(['success' => false, 'message' => 'Missing required fields for update.']);
     exit();
 }
 
