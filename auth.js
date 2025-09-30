@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.success) {
                     messageDiv.textContent = 'Login successful! Redirecting...';
                     messageDiv.classList.add('text-green-600');
-                    window.location.href = 'index.html';
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000); // 1-second delay before redirecting
                 } else {
                     messageDiv.textContent = result.message || 'An unknown error occurred.';
                     messageDiv.classList.add('text-red-600');
