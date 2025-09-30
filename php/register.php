@@ -7,9 +7,9 @@ require_once 'db_connect.php';
 // 2. Set the content type to JSON
 header('Content-Type: application/json');
 
-// 3. Get the input from the form
-$username = $_POST['username'] ?? '';
-$password = $_POST['password'] ?? '';
+// 3. Get the input from the form (compatible with older PHP)
+$username = isset($_POST['username']) ? $_POST['username'] : '';
+$password = isset($_POST['password']) ? $_POST['password'] : '';
 
 // 4. Basic validation
 if (empty($username) || empty($password)) {
