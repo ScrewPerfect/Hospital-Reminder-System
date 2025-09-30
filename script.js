@@ -152,10 +152,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (appointmentList) {
         appointmentList.addEventListener('click', async (e) => {
+            console.log("Appointment list clicked!"); // DEBUG: Check if any click is registered
+
             // Handle Delete
             if (e.target.closest('.delete-btn')) {
+                console.log("Delete button identified!"); // DEBUG: Check if delete button is found
                 const btn = e.target.closest('.delete-btn');
                 const id = btn.dataset.id;
+                console.log("Appointment ID to delete:", id); // DEBUG: Check if ID is read
                 if (confirm('Are you sure you want to delete this appointment?')) {
                     try {
                         const response = await fetch('php/delete_appointment.php', {
@@ -178,8 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Handle Edit
             if (e.target.closest('.edit-btn')) {
+                console.log("Edit button identified!"); // DEBUG: Check if edit button is found
                 const btn = e.target.closest('.edit-btn');
                 const id = btn.dataset.id;
+                console.log("Appointment ID to edit:", id); // DEBUG: Check if ID is read
                 openEditModal(id);
             }
         });
