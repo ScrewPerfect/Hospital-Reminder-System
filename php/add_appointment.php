@@ -1,36 +1,37 @@
 <?php
-header('Content-Type: application/json');
+session_start();
 require_once 'db_connect.php';
 
-$response = ['success' => false, 'message' => 'An unknown error occurred.'];
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check if all required fields are provided
-    if (isset($_POST['patientName']) && isset($_POST['doctorName']) && isset($_POST['appointmentDate']) && isset($_POST['appointmentTime'])) {
-        $patient_name = $_POST['patientName'];
-        $doctor_name = $_POST['doctorName'];
-        $date = $_POST['appointmentDate'];
-        $time = $_POST['appointmentTime'];
-        $notes = isset($_POST['notes']) ? $_POST['notes'] : '';
-
-        $stmt = $conn->prepare("INSERT INTO appointments (patient_name, doctor_name, date, time, notes) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $patient_name, $doctor_name, $date, $time, $notes);
-
-        if ($stmt->execute()) {
-            $response['success'] = true;
-            $response['message'] = 'Appointment added successfully!';
-        } else {
-            $response['message'] = 'Error: ' . $stmt->error;
-        }
-        $stmt->close();
-    } else {
-        $response['message'] = 'Required fields are missing.';
-    }
-} else {
-    $response['message'] = 'Invalid request method.';
+// Security check: ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to add an appointment.']);
+    exit();
 }
 
-$conn->close();
-echo json_encode($response);
-?>
+$user_id = $_SESSION['user_id'];
 
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    $patient_name = $data['patientName'];
+    $doctor_name = $data['doctorName'];
+    $date = $data['appointmentDate'];
+    $time = $data['appointmentTime'];
+    $notes = $data['notes'];
+
+    $sql = "INSERT INTO appointments (user_id, patient_name, doctor_name, date, time, notes) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("isssss", $user_id, $patient_name, $doctor_name, $date, $time, $notes);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'id' => $conn->insert_id]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
+    }
+    $stmt->close();
+}
+$conn->close();
+?>
