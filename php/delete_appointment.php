@@ -1,36 +1,156 @@
 <?php
-header('Content-Type: application/json');
+session_start();
 require_once 'db_connect.php';
 
-$response = ['success' => false, 'message' => 'An unknown error occurred.'];
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check if the appointment ID is provided
-    if (isset($_POST['id'])) {
-        $id = intval($_POST['id']);
-
-        $stmt = $conn->prepare("DELETE FROM appointments WHERE id = ?");
-        $stmt->bind_param("i", $id);
-
-        if ($stmt->execute()) {
-            if ($stmt->affected_rows > 0) {
-                $response['success'] = true;
-                $response['message'] = 'Appointment deleted successfully!';
-            } else {
-                $response['message'] = 'No appointment found with that ID.';
-            }
-        } else {
-            $response['message'] = 'Error: ' . $stmt->error;
-        }
-        $stmt->close();
-    } else {
-        $response['message'] = 'Appointment ID is missing.';
-    }
-} else {
-    $response['message'] = 'Invalid request method.';
+// Security check: ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to delete an appointment.']);
+    exit();
 }
 
+$user_id = $_SESSION['user_id'];
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $appointment_id = $data['id'];
+
+    // Security: Ensure the user owns the appointment they are trying to delete
+    $sql = "DELETE FROM appointments WHERE id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $appointment_id, $user_id);
+
+    if ($stmt->execute()) {
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(['success' => true]);
+        } else {
+            // Either the appointment didn't exist or the user didn't have permission
+            echo json_encode(['success' => false, 'message' => 'Appointment not found or permission denied.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    $stmt->close();
+}
 $conn->close();
-echo json_encode($response);
+?>
+
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Security check: ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to delete an appointment.']);
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $appointment_id = $data['id'];
+
+    // Security: Ensure the user owns the appointment they are trying to delete
+    $sql = "DELETE FROM appointments WHERE id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $appointment_id, $user_id);
+
+    if ($stmt->execute()) {
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(['success' => true]);
+        } else {
+            // Either the appointment didn't exist or the user didn't have permission
+            echo json_encode(['success' => false, 'message' => 'Appointment not found or permission denied.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    $stmt->close();
+}
+$conn->close();
+?>
+
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Security check: ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to delete an appointment.']);
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $appointment_id = $data['id'];
+
+    // Security: Ensure the user owns the appointment they are trying to delete
+    $sql = "DELETE FROM appointments WHERE id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $appointment_id, $user_id);
+
+    if ($stmt->execute()) {
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(['success' => true]);
+        } else {
+            // Either the appointment didn't exist or the user didn't have permission
+            echo json_encode(['success' => false, 'message' => 'Appointment not found or permission denied.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    $stmt->close();
+}
+$conn->close();
+?>
+
+<?php
+session_start();
+require_once 'db_connect.php';
+
+// Security check: ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'You must be logged in to delete an appointment.']);
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $appointment_id = $data['id'];
+
+    // Security: Ensure the user owns the appointment they are trying to delete
+    $sql = "DELETE FROM appointments WHERE id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $appointment_id, $user_id);
+
+    if ($stmt->execute()) {
+        if ($stmt->affected_rows > 0) {
+            echo json_encode(['success' => true]);
+        } else {
+            // Either the appointment didn't exist or the user didn't have permission
+            echo json_encode(['success' => false, 'message' => 'Appointment not found or permission denied.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    $stmt->close();
+}
+$conn->close();
 ?>
 
