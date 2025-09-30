@@ -1,98 +1,11 @@
-/* --- Base & Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body {
     font-family: 'Inter', sans-serif;
-    transition: background-color 0.3s ease;
+    background-color: #f8f9fa; /* Lighter gray */
 }
 
-/* --- Animations --- */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.appointment-card {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-/* --- General Components --- */
-.card {
-    background-color: white;
-    border-radius: 1.25rem; /* More rounded */
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-    overflow: hidden; /* Important for child rounded corners */
-    transition: box-shadow 0.3s ease;
-}
-.card:hover {
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
-}
-.card-header {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #334155; /* slate-700 */
-    border-bottom: 1px solid #e2e8f0; /* slate-200 */
-    padding: 1.5rem;
-    background-color: #f8fafc; /* slate-50 */
-}
-
-.feedback-state {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #64748b; /* slate-500 */
-}
-
-/* --- Form Styles --- */
-.form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #475569; /* slate-600 */
-    margin-bottom: 0.25rem;
-}
-
-.form-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #cbd5e1; /* slate-300 */
-    border-radius: 0.75rem;
-    transition: ring 0.2s, border-color 0.2s;
-}
-.form-input:focus {
-    outline: none;
-    border-color: #3b82f6; /* blue-500 */
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.submit-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    font-weight: 600;
-    color: white;
-    padding: 0.875rem 1rem;
-    border-radius: 0.75rem;
-    background-image: linear-gradient(to right, #3b82f6, #60a5fa);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-}
-.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 10px rgba(59, 130, 246, 0.3);
-}
-
-/* --- Calendar Styles --- */
+/* Custom calendar styles */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -100,34 +13,196 @@ body {
 }
 
 .calendar-day {
-    padding: 0.5rem;
-    border-radius: 9999px; /* circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    font-weight: 500;
 }
+
 .calendar-day:hover {
-    background-color: #f1f5f9; /* slate-100 */
+    background-color: #e9ecef;
 }
 
 .calendar-day.today {
-    background-color: #e0e7ff; /* indigo-100 */
-    color: #4338ca; /* indigo-700 */
-    font-weight: 700;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
 }
 
 .calendar-day.has-appointment {
-    background-color: #3b82f6; /* blue-500 */
-    color: white;
     position: relative;
 }
 
-.nav-btn {
-    padding: 0.5rem;
-    border-radius: 9999px;
-    transition: background-color 0.2s;
+/* Dot indicator for appointments */
+.calendar-day.has-appointment::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #dc3545; /* Red dot */
 }
-.nav-btn:hover {
-    background-color: #e2e8f0; /* slate-200 */
+.calendar-day.today.has-appointment::after {
+    background-color: white;
+}
+
+
+/* New styles for a nicer look */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+
+.main-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info span {
+    font-weight: 500;
+    color: #495057;
+}
+
+.logout-btn {
+    background-color: #f1f3f5;
+    color: #495057;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+.form-card, .calendar-card, .appointments-card {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.form-card:hover, .calendar-card:hover, .appointments-card:hover {
+     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.submit-btn {
+    width: 100%;
+    background-image: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Updated Appointment Card Style */
+.appointment-card {
+    background-color: #f8f9fa;
+    border-left: 5px solid #007bff;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.countdown-tag {
+    background-color: #e7f3ff;
+    color: #0056b3;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+.countdown-tag.today {
+    background-color: #28a745;
+    color: white;
+}
+.countdown-tag.past {
+    background-color: #6c757d;
+    color: white;
+}
+
+
+.notes-section {
+    background-color: #e9ecef;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
+    font-style: italic;
+    color: #495057;
+}
+
+.delete-btn {
+    background-color: transparent;
+    color: #6c757d;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+.delete-btn:hover {
+    color: #dc3545;
+    background-color: #fce8e6;
+}
+
+/* Empty state styling */
+#emptyState {
+    border: 2px dashed #dee2e6;
+    border-radius: 1rem;
 }
 

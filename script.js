@@ -65,28 +65,35 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAppointment(app) {
         const div = document.createElement('div');
         div.className = 'appointment-card';
+        
+        const countdownInfo = calculateCountdown(app.date);
+
         div.innerHTML = `
             <div class="flex-grow">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-bold text-lg text-blue-700">${app.patient_name}</h3>
-                    <div class="countdown-tag">${calculateCountdown(app.date)}</div>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-lg text-gray-800">${app.patient_name}</h3>
+                    <div class="countdown-tag ${countdownInfo.class}">${countdownInfo.text}</div>
                 </div>
-                <p class="text-sm text-gray-600">With <span class="font-semibold">${app.doctor_name}</span></p>
-                <div class="text-sm text-gray-500 mt-2 flex items-center">
-                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <p class="text-sm text-gray-600 flex items-center gap-2">
+                    <i data-lucide="user-md" class="w-4 h-4 text-gray-500"></i>
+                    With <span class="font-semibold">${app.doctor_name}</span>
+                </p>
+                <div class="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                     <i data-lucide="calendar-days" class="w-4 h-4 text-gray-500"></i>
                     ${new Date(app.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
-                <div class="text-sm text-gray-500 flex items-center mt-1">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="text-sm text-gray-500 flex items-center mt-1 gap-2">
+                    <i data-lucide="clock" class="w-4 h-4 text-gray-500"></i>
                     ${formatTime(app.time)}
                 </div>
-                ${app.notes ? `<div class="notes-section mt-3 pt-3 border-t border-gray-200"><p class="text-sm text-gray-800">${app.notes}</p></div>` : ''}
+                ${app.notes ? `<div class="notes-section mt-3"><p class="text-sm">${app.notes}</p></div>` : ''}
             </div>
             <button class="delete-btn" data-id="${app.id}">
-                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                 <i data-lucide="trash-2" class="w-5 h-5"></i>
             </button>
         `;
         appointmentList.appendChild(div);
+        lucide.createIcons(); // Re-render icons for the new element
     }
 
     function calculateCountdown(dateStr) {
@@ -96,10 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffTime = appDate - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays < 0) return 'Past';
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Tomorrow';
-        return `In ${diffDays} days`;
+        if (diffDays < 0) return { text: 'Past', class: 'past' };
+        if (diffDays === 0) return { text: 'Today', class: 'today' };
+        if (diffDays === 1) return { text: 'Tomorrow', class: '' };
+        return { text: `In ${diffDays} days`, class: '' };
     }
     
     function formatTime(timeStr) {
