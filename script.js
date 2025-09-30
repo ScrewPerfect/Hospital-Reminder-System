@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('emptyState');
     const userWelcome = document.getElementById('userWelcome');
 
+    // New variables for the edit modal
+    const editModal = document.getElementById('editModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const editAppointmentForm = document.getElementById('editAppointmentForm');
+    
+    let appointmentsCache = []; // To store fetched appointments temporarily
+
     let currentDate = new Date();
 
     async function checkLoginStatus() {
@@ -22,10 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/check_session.php');
             const data = await response.json();
             if (!data.loggedIn) {
-                // If not logged in, redirect to login page immediately
                 window.location.href = 'login.html';
             } else {
-                // If logged in, display welcome message and load appointments
                 if(userWelcome) {
                     userWelcome.textContent = `Welcome, ${data.username}!`;
                 }
@@ -33,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error checking login status:', error);
-            // If there's an error, redirect to login as a fallback
             window.location.href = 'login.html';
         }
     }
@@ -41,11 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchAppointments() {
         loadingState.style.display = 'block';
         emptyState.style.display = 'none';
-        appointmentList.innerHTML = ''; // Clear previous list
+        appointmentList.innerHTML = ''; 
          try {
-            // Append a cache-busting parameter
             const response = await fetch(`php/get_appointments.php?t=${new Date().getTime()}`);
             const appointments = await response.json();
+            
+            appointmentsCache = appointments; // Cache the appointments
             
             loadingState.style.display = 'none';
             
@@ -88,12 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 ${app.notes ? `<div class="notes-section mt-3"><p class="text-sm">${app.notes}</p></div>` : ''}
             </div>
-            <button class="delete-btn" data-id="${app.id}">
-                 <i data-lucide="trash-2" class="w-5 h-5"></i>
-            </button>
+            <div class="flex flex-col">
+                <button class="edit-btn" data-id="${app.id}">
+                    <i data-lucide="pencil" class="w-5 h-5"></i>
+                </button>
+                <button class="delete-btn" data-id="${app.id}">
+                     <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>
         `;
         appointmentList.appendChild(div);
-        lucide.createIcons(); // Re-render icons for the new element
+        lucide.createIcons();
     }
 
     function calculateCountdown(dateStr) {
@@ -142,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (appointmentList) {
         appointmentList.addEventListener('click', async (e) => {
+            // Handle Delete
             if (e.target.closest('.delete-btn')) {
                 const btn = e.target.closest('.delete-btn');
                 const id = btn.dataset.id;
@@ -164,8 +175,73 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
+            
+            // Handle Edit
+            if (e.target.closest('.edit-btn')) {
+                const btn = e.target.closest('.edit-btn');
+                const id = btn.dataset.id;
+                openEditModal(id);
+            }
         });
     }
+    
+    // --- Edit Modal Logic ---
+    function openEditModal(id) {
+        const appointmentToEdit = appointmentsCache.find(app => app.id == id);
+        if (!appointmentToEdit) {
+            alert('Could not find appointment to edit.');
+            return;
+        }
+
+        document.getElementById('editAppointmentId').value = appointmentToEdit.id;
+        document.getElementById('editPatientName').value = appointmentToEdit.patient_name;
+        document.getElementById('editDoctorName').value = appointmentToEdit.doctor_name;
+        document.getElementById('editAppointmentDate').value = appointmentToEdit.date;
+        document.getElementById('editAppointmentTime').value = appointmentToEdit.time;
+        document.getElementById('editNotes').value = appointmentToEdit.notes;
+
+        editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        editModal.classList.add('hidden');
+    }
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeEditModal);
+    }
+    if (editModal) {
+        // Close modal if user clicks on the overlay
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+    }
+
+    if (editAppointmentForm) {
+        editAppointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(editAppointmentForm);
+            try {
+                const response = await fetch('php/update_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    closeEditModal();
+                    fetchAppointments(); // Refresh the list
+                } else {
+                    alert('Error updating appointment: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating form:', error);
+                alert('An error occurred while saving changes. Please try again.');
+            }
+        });
+    }
+
 
      // --- Calendar Logic ---
     async function renderCalendar() {
@@ -178,10 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         
-        // Fetch appointments for the current month view
-        const response = await fetch(`php/get_appointments.php?t=${new Date().getTime()}`);
-        const appointments = await response.json();
-        const appointmentDates = appointments.map(app => app.date);
+        // Use the cached appointments for the calendar
+        const appointmentDates = appointmentsCache.map(app => app.date);
 
         // Create blank days for padding
         for (let i = 0; i < firstDay; i++) {
@@ -200,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayCell.classList.add('today');
             }
             
-            // Check for appointments
             const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
             if(appointmentDates.includes(cellDateStr)) {
                 dayCell.classList.add('has-appointment');
@@ -223,8 +296,5 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
         });
     }
-
-    // Initial render
-    // We don't call renderCalendar() here anymore because fetchAppointments() will do it
 });
 
