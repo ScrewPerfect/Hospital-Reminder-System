@@ -36,7 +36,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     // User found, now verify password
-    $user = result->fetch_assoc();
+    $user = $result->fetch_assoc();
     
     if (password_verify($password, $user['password'])) {
         // Password is correct, login successful
