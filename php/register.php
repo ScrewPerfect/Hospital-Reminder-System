@@ -1,47 +1,64 @@
 <?php
+// File: register.php
+
+// 1. Include the database connection
 require_once 'db_connect.php';
 
+// 2. Set the content type to JSON
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $username = $data['username'] ?? '';
-    $password = $data['password'] ?? '';
+// 3. Get the input from the form
+$username = $_POST['username'] ?? '';
+$password = $_POST['password'] ?? '';
 
-    if (empty($username) || empty($password)) {
-        echo json_encode(['success' => false, 'message' => 'Username and password are required.']);
-        exit();
-    }
-
-    // Check if username already exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        echo json_encode(['success' => false, 'message' => 'Username already taken.']);
-        $stmt->close();
-        $conn->close();
-        exit();
-    }
-    $stmt->close();
-
-    // Hash the password for security
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert new user into the database
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $username, $password_hash);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'An error occurred. Please try again.']);
-    }
-
-    $stmt->close();
-    $conn->close();
+// 4. Basic validation
+if (empty($username) || empty($password)) {
+    echo json_encode(['success' => false, 'message' => 'Username and password are required.']);
+    exit();
 }
+
+// 5. Check if the username already exists
+$sql_check = "SELECT id FROM users WHERE username = ?";
+$stmt_check = $conn->prepare($sql_check);
+if ($stmt_check === false) {
+    echo json_encode(['success' => false, 'message' => 'Database prepare error (check).']);
+    exit();
+}
+$stmt_check->bind_param("s", $username);
+$stmt_check->execute();
+$stmt_check->store_result();
+
+if ($stmt_check->num_rows > 0) {
+    // Username already exists
+    echo json_encode(['success' => false, 'message' => 'Username already exists. Please choose another.']);
+    $stmt_check->close();
+    $conn->close();
+    exit();
+}
+$stmt_check->close();
+
+// 6. Hash the password for security
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+// 7. Insert the new user into the database
+$sql_insert = "INSERT INTO users (username, password) VALUES (?, ?)";
+$stmt_insert = $conn->prepare($sql_insert);
+if ($stmt_insert === false) {
+    echo json_encode(['success' => false, 'message' => 'Database prepare error (insert).']);
+    exit();
+}
+$stmt_insert->bind_param("ss", $username, $hashed_password);
+
+if ($stmt_insert->execute()) {
+    // Registration successful
+    echo json_encode(['success' => true]);
+} else {
+    // Registration failed
+    echo json_encode(['success' => false, 'message' => 'Registration failed. Please try again.']);
+}
+
+// 8. Close connections
+$stmt_insert->close();
+$conn->close();
 ?>
 
