@@ -1,31 +1,33 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-// Security check: ensure user is logged in
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(401); // Unauthorized
-    echo json_encode(['error' => 'User not logged in.']);
+    echo json_encode(['success' => false, 'message' => 'User not authenticated']);
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-header('Content-Type: application/json');
-
-$sql = "SELECT * FROM appointments WHERE user_id = ? ORDER BY date, time";
+// Fetch appointments for the logged-in user
+$sql = "SELECT id, patient_name, doctor_name, date, time, notes FROM appointments WHERE user_id = ? ORDER BY date, time";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
 
-$appointments = [];
-while ($row = $result->fetch_assoc()) {
-    $appointments[] = $row;
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $appointments = [];
+    while ($row = $result->fetch_assoc()) {
+        $appointments[] = $row;
+    }
+    echo json_encode(['success' => true, 'appointments' => $appointments]);
+    $stmt->close();
+} else {
+    echo json_encode(['success' => false, 'message' => 'Database prepare statement failed.']);
 }
 
-echo json_encode($appointments);
-
-$stmt->close();
 $conn->close();
 ?>
