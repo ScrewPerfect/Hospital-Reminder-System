@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageDiv.classList.add('text-green-600');
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 2000);
+                    }, 1000); // 1-second delay before redirecting
                 } else {
                     messageDiv.textContent = result.message || 'An unknown error occurred.';
                     messageDiv.classList.add('text-red-600');
