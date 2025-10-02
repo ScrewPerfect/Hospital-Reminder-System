@@ -160,18 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     appointmentList.addEventListener('click', (e) => {
-        console.log("Clicked element:", e.target);
         const editButton = e.target.closest('.edit-btn');
         const deleteButton = e.target.closest('.delete-btn');
 
         if (editButton) {
-            console.log("Edit button clicked for ID:", editButton.dataset.id);
             openEditModal(editButton.dataset.id);
             return;
         }
 
         if (deleteButton) {
-            console.log("Delete button clicked for ID:", deleteButton.dataset.id);
             if (confirm('Are you sure you want to delete this appointment?')) {
                 deleteAppointment(deleteButton.dataset.id);
             }
