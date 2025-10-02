@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Dashboard - Hospital Appointment Reminder</title>
+    <title>Hospital Appointment Reminder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-50 text-slate-800">
+
+<body class="bg-gray-50 text-gray-800 font-sans">
 
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         <!-- Header -->
         <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Your Dashboard</h1>
-            <p class="text-slate-500 mt-2">Never miss an important consultation again.</p>
-            <div id="user-info" class="mt-4 text-sm">
-                <!-- User info will be injected here by script.js -->
-            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-blue-600 tracking-tight">Your Dashboard</h1>
+            <p class="text-gray-500 mt-2 text-lg">Never miss an important consultation again.</p>
+            <div id="user-info" class="mt-4 text-right"></div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -26,7 +25,7 @@
             <div class="lg:col-span-1 space-y-8">
                 <!-- Add Appointment Form -->
                 <div class="card">
-                    <h2 class="card-header">Set a New Reminder</h2>
+                    <h2 class="form-title">Set a New Reminder</h2>
                     <form id="appointmentForm" class="space-y-4">
                         <div>
                             <label for="patient_name" class="form-label">Patient Name</label>
@@ -40,9 +39,17 @@
                             <label for="appointment_date" class="form-label">Appointment Date</label>
                             <input type="date" id="appointment_date" name="appointment_date" required class="form-input">
                         </div>
-                         <div>
+                        <div>
                             <label for="appointment_time" class="form-label">Appointment Time</label>
                             <input type="time" id="appointment_time" name="appointment_time" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" name="status" required class="form-input">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Canceled">Canceled</option>
+                            </select>
                         </div>
                         <div>
                             <label for="notes" class="form-label">Notes / Reason for Visit</label>
@@ -57,15 +64,15 @@
                 <!-- Mini Calendar -->
                 <div class="card">
                     <div id="calendar" class="space-y-4">
-                         <div class="flex items-center justify-between">
-                            <button id="prevMonth" class="p-2 rounded-full hover:bg-slate-100 transition-colors">&lt;</button>
-                            <h3 id="monthYear" class="text-lg font-semibold text-slate-700"></h3>
-                            <button id="nextMonth" class="p-2 rounded-full hover:bg-slate-100 transition-colors">&gt;</button>
+                        <div class="flex items-center justify-between">
+                            <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100 transition-colors">&lt;</button>
+                            <h3 id="monthYear" class="text-lg font-semibold text-gray-700"></h3>
+                            <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100 transition-colors">&gt;</button>
                         </div>
-                        <div class="grid grid-cols-7 text-center text-xs font-medium text-slate-500">
+                        <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="grid grid-cols-7 text-center">
+                        <div id="calendarDays" class="grid grid-cols-7 text-center text-gray-600">
                             <!-- Calendar days will be generated here -->
                         </div>
                     </div>
@@ -75,18 +82,16 @@
             <!-- Right Column: Upcoming Appointments -->
             <div class="lg:col-span-2">
                 <div class="card min-h-full">
-                    <h2 class="card-header">Upcoming Appointments</h2>
+                    <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-3">Upcoming Appointments</h2>
                     <div id="appointmentList" class="space-y-4">
                         <!-- Appointments will be rendered here -->
                         <div id="loadingState" class="text-center py-10">
-                            <p class="text-slate-500">Loading appointments...</p>
+                            <p class="text-gray-500">Loading appointments...</p>
                         </div>
-                         <div id="emptyState" class="hidden text-center py-10 px-4">
-                            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008z" />
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-slate-900">No appointments scheduled</h3>
-                            <p class="mt-1 text-sm text-slate-500">Use the form on the left to add a new reminder.</p>
+                        <div id="emptyState" class="hidden text-center py-10 px-4">
+                            <i data-lucide="calendar-off" class="mx-auto h-12 w-12 text-gray-400"></i>
+                            <h3 class="mt-2 text-lg font-medium text-gray-900">No appointments scheduled</h3>
+                            <p class="mt-1 text-sm text-gray-500">Use the form on the left to add a new reminder.</p>
                         </div>
                     </div>
                 </div>
@@ -95,35 +100,44 @@
     </div>
 
     <!-- Edit Appointment Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center transition-opacity">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-transform scale-95">
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">Edit Appointment</h2>
-            <form id="editAppointmentForm">
-                <input type="hidden" id="editAppointmentId" name="id">
-                <div class="space-y-4">
-                    <div>
-                        <label for="edit_patient_name" class="form-label">Patient Name</label>
-                        <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
-                    </div>
-                    <div>
-                        <label for="edit_doctor_name" class="form-label">Doctor's Name</label>
-                        <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
-                    </div>
-                    <div>
-                        <label for="edit_appointment_date" class="form-label">Appointment Date</label>
-                        <input type="date" id="edit_appointment_date" name="date" required class="form-input">
-                    </div>
-                    <div>
-                        <label for="edit_appointment_time" class="form-label">Appointment Time</label>
-                        <input type="time" id="edit_appointment_time" name="time" required class="form-input">
-                    </div>
-                    <div>
-                        <label for="edit_notes" class="form-label">Notes</label>
-                        <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>
-                    </div>
+    <div id="editModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="form-title">Edit Appointment</h2>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <form id="editAppointmentForm" class="space-y-4">
+                <input type="hidden" id="edit_appointment_id" name="id">
+                <div>
+                    <label for="edit_patient_name" class="form-label">Patient Name</label>
+                    <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
                 </div>
-                <div class="mt-8 flex justify-end space-x-4">
-                    <button type="button" id="cancelEdit" class="button-secondary">Cancel</button>
+                <div>
+                    <label for="edit_doctor_name" class="form-label">Doctor's Name</label>
+                    <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
+                </div>
+                <div>
+                    <label for="edit_appointment_date" class="form-label">Appointment Date</label>
+                    <input type="date" id="edit_appointment_date" name="appointment_date" required class="form-input">
+                </div>
+                <div>
+                    <label for="edit_appointment_time" class="form-label">Appointment Time</label>
+                    <input type="time" id="edit_appointment_time" name="appointment_time" required class="form-input">
+                </div>
+                <div>
+                    <label for="edit_status" class="form-label">Status</label>
+                    <select id="edit_status" name="status" required class="form-input">
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Canceled">Canceled</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="edit_notes" class="form-label">Notes / Reason for Visit</label>
+                    <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                     <button type="button" id="cancelEdit" class="button-secondary">Cancel</button>
                     <button type="submit" class="button-primary">Save Changes</button>
                 </div>
             </form>
