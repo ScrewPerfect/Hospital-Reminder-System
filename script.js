@@ -72,7 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = renderAppointment(app);
                 appointmentList.appendChild(card);
             });
-            lucide.createIcons();
+            // Ensure lucide icons are rendered after HTML is added
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
     };
 
@@ -96,8 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="appointment-actions flex items-center space-x-2">
                      <span class="status-tag ${statusClass}">${app.status}</span>
-                    <button class="edit-btn" data-id="${app.id}"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                    <button class="delete-btn" data-id="${app.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button class="edit-btn p-1 hover:bg-gray-100 rounded-full" data-id="${app.id}" title="Edit Appointment"><i data-lucide="edit-2" class="w-4 h-4 pointer-events-none"></i></button>
+                    <button class="delete-btn p-1 hover:bg-gray-100 rounded-full" data-id="${app.id}" title="Delete Appointment"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
                 </div>
             </div>
             <div class="appointment-card-body mt-4 space-y-2">
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('php/add_appointment.php', {
                 method: 'POST',
-                body: formData // Send the FormData object directly
+                body: formData 
             });
             const result = await response.json();
             if (result.success) {
@@ -156,17 +159,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    appointmentList.addEventListener('click', async (e) => {
-        const target = e.target.closest('button');
-        if (!target) return;
+    appointmentList.addEventListener('click', (e) => {
+        console.log("Clicked element:", e.target);
+        const editButton = e.target.closest('.edit-btn');
+        const deleteButton = e.target.closest('.delete-btn');
 
-        const id = target.dataset.id;
-        if (target.classList.contains('delete-btn')) {
+        if (editButton) {
+            console.log("Edit button clicked for ID:", editButton.dataset.id);
+            openEditModal(editButton.dataset.id);
+            return;
+        }
+
+        if (deleteButton) {
+            console.log("Delete button clicked for ID:", deleteButton.dataset.id);
             if (confirm('Are you sure you want to delete this appointment?')) {
-                deleteAppointment(id);
+                deleteAppointment(deleteButton.dataset.id);
             }
-        } else if (target.classList.contains('edit-btn')) {
-            openEditModal(id);
+            return;
         }
     });
 
@@ -202,6 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit_status').value = appointment.status;
             document.getElementById('edit_notes').value = appointment.notes;
             editModal.classList.remove('hidden');
+        } else {
+            console.error("Could not find appointment with ID:", id);
         }
     };
 
