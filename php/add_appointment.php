@@ -10,13 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$data = json_decode(file_get_contents('php://input'), true);
-
-// Check if JSON decoding was successful
-if ($data === null) {
-    echo json_encode(['success' => false, 'message' => 'Error: Could not read input data.']);
-    exit();
-}
+$data = $_POST; // Read data from the standard POST variable
 
 // Detailed validation
 $errors = [];

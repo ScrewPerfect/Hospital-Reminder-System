@@ -137,13 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
     appointmentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(appointmentForm);
-        const data = Object.fromEntries(formData.entries());
 
         try {
             const response = await fetch('php/add_appointment.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: formData // Send the FormData object directly
             });
             const result = await response.json();
             if (result.success) {
@@ -173,11 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const deleteAppointment = async (id) => {
+        const formData = new FormData();
+        formData.append('id', id);
+
         try {
             const response = await fetch('php/delete_appointment.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
+                body: formData
             });
             const result = await response.json();
             if (result.success) {
@@ -215,13 +215,11 @@ document.addEventListener('DOMContentLoaded', () => {
     editAppointmentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(editAppointmentForm);
-        const data = Object.fromEntries(formData.entries());
 
         try {
             const response = await fetch('php/update_appointment.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: formData
             });
             const result = await response.json();
             if (result.success) {
