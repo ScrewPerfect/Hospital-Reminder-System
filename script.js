@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const formatTime = (timeString) => {
+        if (!timeString) return '';
         const [hour, minute] = timeString.split(':');
         const hourNum = parseInt(hour, 10);
         const ampm = hourNum >= 12 ? 'PM' : 'AM';
@@ -149,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetchAppointments();
                 appointmentForm.reset();
             } else {
-                alert(result.message || 'Error adding appointment.');
+                alert(result.message);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -182,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 fetchAppointments();
             } else {
-                alert(result.message || 'Error deleting appointment.');
+                alert(result.message);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeEditModal();
                 fetchAppointments();
             } else {
-                alert(result.message || 'Error updating appointment.');
+                alert(result.message);
             }
         } catch (error) {
             console.error('Error:', error);
