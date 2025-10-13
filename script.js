@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userInfoDiv) {
                     userInfoDiv.innerHTML = `
                         <p>
-                            Welcome, <strong>${session.username}</strong> | 
-                            <a href="profile.html">Profile</a> | 
-                            <a href="php/logout.php">Logout</a>
+                            Welcome, <span class="font-semibold text-gray-800">${session.username}</span> | 
+                            <a href="profile.html" class="text-blue-600 hover:underline">Profile</a> | 
+                            <a href="php/logout.php" class="text-blue-600 hover:underline">Logout</a>
                         </p>
                     `;
                 }
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAppointments() {
         loadingState.style.display = 'block';
-        emptyState.classList.add('hidden');
+        emptyState.style.display = 'none';
         appointmentList.innerHTML = '';
 
         try {
@@ -63,8 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error fetching appointments:', error);
-            loadingState.style.display = 'none';
-            emptyState.classList.remove('hidden');
             alert('An error occurred while fetching appointments.');
         } finally {
             loadingState.style.display = 'none';
@@ -74,44 +72,62 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAppointments() {
         appointmentList.innerHTML = '';
         if (appointments.length === 0) {
-            emptyState.classList.remove('hidden');
+            emptyState.style.display = 'block';
         } else {
-            emptyState.classList.add('hidden');
+            emptyState.style.display = 'none';
             appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
             appointments.forEach(app => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
+        // Re-initialize lucide icons
         lucide.createIcons();
     }
     
     function createAppointmentCard(app) {
         const card = document.createElement('div');
-        card.className = 'appointment-card card';
+        card.className = 'appointment-card';
         card.dataset.id = app.id;
 
         const countdown = calculateCountdown(app.date, app.time);
 
         card.innerHTML = `
-            <div class="countdown">
-                <div class="countdown-timer">${countdown}</div>
-                <div style="font-size: 0.75rem; color: #6b7280;">left</div>
+            <div class="appointment-card-content">
+                <div class="appointment-card-header">
+                    <i data-lucide="user" class="appointment-card-icon"></i>
+                    <p class="appointment-card-title">${app.patient_name}</p>
+                </div>
+                <div class="appointment-card-subheader">
+                    <i data-lucide="stethoscope" class="appointment-card-icon"></i>
+                    <p>with Dr. ${app.doctor_name}</p>
+                </div>
+                <div class="appointment-card-details">
+                    <div class="detail-item">
+                        <i data-lucide="calendar" class="appointment-card-icon"></i>
+                        <span>${new Date(app.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i data-lucide="clock" class="appointment-card-icon"></i>
+                        <span>${new Date('1970-01-01T' + app.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                    </div>
+                     <div class="detail-item">
+                        <i data-lucide="info" class="appointment-card-icon"></i>
+                        <p class="flex-1">Notes: <span class="text-gray-800">${app.notes || 'N/A'}</span></p>
+                    </div>
+                </div>
             </div>
-            <div style="flex-grow: 1;">
-                <p style="font-weight: 700; font-size: 1.125rem;">${app.patient_name}</p>
-                <p style="color: #6b7280; margin-bottom: 1rem;">with Dr. ${app.doctor_name}</p>
-                <p><strong>Date:</strong> ${new Date(app.date + 'T00:00:00').toLocaleDateString()}</p>
-                <p><strong>Time:</strong> ${new Date('1970-01-01T' + app.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                <p><strong>Notes:</strong> ${app.notes || 'N/A'}</p>
-            </div>
-            <div>
-                <div class="status-tag status-${app.status}">${app.status}</div>
-                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
-                    <button class="edit-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="edit-2"></i>
+            <div class="appointment-card-right-panel">
+                <div class="countdown">
+                    <span class="countdown-timer">${countdown}</span>
+                    <span class="countdown-label">left</span>
+                </div>
+                <span class="status-tag status-${String(app.status).toLowerCase()}">${app.status}</span>
+                 <div class="appointment-card-actions">
+                    <button class="icon-button edit-btn" data-id="${app.id}">
+                        <i data-lucide="edit-2" class="h-5 w-5"></i>
                     </button>
-                    <button class="delete-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="trash-2"></i>
+                    <button class="icon-button delete-btn" data-id="${app.id}">
+                        <i data-lucide="trash-2" class="h-5 w-5"></i>
                     </button>
                 </div>
             </div>
@@ -127,12 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diff < 0) return "Past";
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        if (days > 0) return `${days}d`;
-        
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        if (hours > 0) return `${hours}h`;
-
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        if (days > 0) return `${days}d`;
+        if (hours > 0) return `${hours}h`;
         return `${minutes}m`;
     }
 
@@ -155,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dayEl = document.createElement('div');
             dayEl.textContent = day;
-            dayEl.className = 'calendar-day';
+            dayEl.classList.add('calendar-day');
             
             const today = new Date();
             if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
@@ -164,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             if (appointmentDates.includes(currentDateStr)) {
+                console.log(`Appointment found for ${currentDateStr}`);
                 dayEl.classList.add('has-appointment');
             }
             
@@ -172,54 +188,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event Listeners
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
-    });
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
 
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
-    appointmentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(appointmentForm);
-        
-        try {
-            const response = await fetch('php/add_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.success) {
-                fetchAppointments();
-                appointmentForm.reset();
-            } else {
-                alert(`Error adding appointment: ${result.message}`);
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(appointmentForm);
+            
+            try {
+                const response = await fetch('php/add_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    fetchAppointments();
+                    appointmentForm.reset();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        }
-    });
+        });
+    }
 
-    appointmentList.addEventListener('click', (e) => {
-        const target = e.target.closest('.edit-btn, .delete-btn');
-        if (!target) return;
+    if (appointmentList) {
+        appointmentList.addEventListener('click', (e) => {
+            const target = e.target.closest('.edit-btn, .delete-btn');
+            if (!target) return;
 
-        const appointmentId = target.dataset.id;
+            const appointmentId = target.dataset.id;
+            console.log(`Button clicked for appointment ID: ${appointmentId}`);
 
-        if (target.classList.contains('edit-btn')) {
-            openEditModal(appointmentId);
-        }
-
-        if (target.classList.contains('delete-btn')) {
-            if(confirm('Are you sure you want to delete this appointment?')) {
-                deleteAppointment(appointmentId);
+            if (target.classList.contains('edit-btn')) {
+                console.log('Edit button clicked');
+                openEditModal(appointmentId);
             }
-        }
-    });
+
+            if (target.classList.contains('delete-btn')) {
+                console.log('Delete button clicked');
+                if(confirm('Are you sure you want to delete this appointment?')) {
+                    deleteAppointment(appointmentId);
+                }
+            }
+        });
+    }
 
 
     function openEditModal(appointmentId) {
@@ -238,38 +265,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+        });
+    }
 
-    cancelEditBtn.addEventListener('click', () => {
-        editModal.classList.add('hidden');
-    });
+    if (editAppointmentForm) {
+        editAppointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(editAppointmentForm);
+            
+            try {
+                const response = await fetch('php/update_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
 
-    editAppointmentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(editAppointmentForm);
-        
-        try {
-            const response = await fetch('php/update_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                editModal.classList.add('hidden');
-                fetchAppointments();
-            } else {
-                alert(`Error updating appointment: ${result.message}`);
+                if (result.success) {
+                    editModal.classList.add('hidden');
+                    fetchAppointments();
+                } else {
+                    alert(`Error updating appointment: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while updating. Please try again.');
-        }
-    });
+        });
+    }
 
     async function deleteAppointment(appointmentId) {
         try {
              const formData = new FormData();
-             formData.append('appointment_id', appointmentId);
+             formData.append('id', appointmentId);
 
             const response = await fetch('php/delete_appointment.php', {
                 method: 'POST',
