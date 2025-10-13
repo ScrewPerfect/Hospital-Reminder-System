@@ -4,70 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Hospital Appointment Reminder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Manage Your Profile
-                </h2>
+    <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4">
+        <div class="w-full max-w-md space-y-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gray-900">Manage Your Profile</h2>
             </div>
-
-            <!-- Message Display Area -->
             <div id="message" class="text-center text-sm font-medium h-5"></div>
-
-            <!-- Update Email Form -->
-            <div class="bg-white p-8 rounded-2xl shadow-lg">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Update Your Email</h3>
+            <div class="bg-white p-8 rounded-2xl shadow-lg space-y-6">
+                <h3 class="text-xl font-bold text-gray-800">Update Your Email</h3>
                 <form id="updateEmailForm" class="space-y-6">
                     <div>
                         <label for="email" class="form-label">Email address</label>
-                        <div class="mt-1">
-                            <input id="email" name="email" type="email" autocomplete="email" required
-                                class="form-input">
-                        </div>
+                        <input id="email" name="email" type="email" autocomplete="email" required class="form-input">
                     </div>
                     <div>
-                        <button type="submit"
-                            class="button-primary w-full">
-                            Save Email
-                        </button>
+                        <button type="submit" class="button-primary w-full">Save Email</button>
                     </div>
                 </form>
             </div>
-
-            <!-- Update Password Form -->
-            <div class="bg-white p-8 rounded-2xl shadow-lg mt-8">
-                 <h3 class="text-xl font-bold text-gray-800 mb-6">Change Your Password</h3>
+            <div class="bg-white p-8 rounded-2xl shadow-lg space-y-6">
+                 <h3 class="text-xl font-bold text-gray-800">Change Your Password</h3>
                 <form id="updatePasswordForm" class="space-y-6">
                     <div>
                         <label for="new_password" class="form-label">New Password</label>
-                        <div class="mt-1">
-                            <input id="new_password" name="new_password" type="password" required
-                                class="form-input">
-                        </div>
+                        <input id="new_password" name="new_password" type="password" required class="form-input">
                     </div>
                      <div>
                         <label for="confirm_password" class="form-label">Confirm New Password</label>
-                        <div class="mt-1">
-                            <input id="confirm_password" name="confirm_password" type="password" required
-                                class="form-input">
-                        </div>
+                        <input id="confirm_password" name="confirm_password" type="password" required class="form-input">
                     </div>
                     <div>
-                        <button type="submit"
-                            class="button-primary w-full">
-                            Update Password
-                        </button>
+                        <button type="submit" class="button-primary w-full">Update Password</button>
                     </div>
                 </form>
             </div>
-
-            <div class="text-center mt-8">
+            <div class="text-center">
                 <a href="index.html" class="font-medium text-blue-600 hover:text-blue-500">
                     &larr; Back to Dashboard
                 </a>
