@@ -1,4 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // This function is called on every page load.
+    // We will determine which page we are on and run the appropriate functions.
+    
+    // Check for elements that are unique to the dashboard page
+    if (document.getElementById('appointmentList')) {
+        initializeDashboard();
+    }
+
+    // Check for elements that are unique to the profile page
+    if (document.getElementById('updateEmailForm')) {
+        initializeProfilePage();
+    }
+
+    // Check for elements unique to the auth pages
+    if (document.getElementById('loginForm') || document.getElementById('registerForm')) {
+        initializeAuthPage();
+    }
+});
+
+
+function initializeDashboard() {
     checkLoginStatus();
 
     const appointmentForm = document.getElementById('appointmentForm');
@@ -6,13 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingState = document.getElementById('loadingState');
     const emptyState = document.getElementById('emptyState');
     
-    // Calendar elements
     const monthYearEl = document.getElementById('monthYear');
     const calendarDaysEl = document.getElementById('calendarDays');
     const prevMonthBtn = document.getElementById('prevMonth');
     const nextMonthBtn = document.getElementById('nextMonth');
 
-    // Edit Modal Elements
     const editModal = document.getElementById('editModal');
     const editAppointmentForm = document.getElementById('editAppointmentForm');
     const cancelEditBtn = document.getElementById('cancelEdit');
@@ -80,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
-        // Re-initialize lucide icons
         lucide.createIcons();
     }
     
@@ -158,11 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCalendar() {
+        if (!calendarDaysEl) return;
         calendarDaysEl.innerHTML = '';
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        if(monthYearEl) monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -185,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             if (appointmentDates.includes(currentDateStr)) {
-                console.log(`Appointment found for ${currentDateStr}`);
                 dayEl.classList.add('has-appointment');
             }
             
@@ -193,59 +211,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event Listeners
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
-    });
+    if(prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
 
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
+    if(nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
-    appointmentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(appointmentForm);
-        
-        try {
-            const response = await fetch('php/add_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.success) {
-                fetchAppointments();
-                appointmentForm.reset();
-            } else {
-                alert(`Error adding appointment: ${result.message}`);
+    if(appointmentForm) {
+        appointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(appointmentForm);
+            
+            try {
+                const response = await fetch('php/add_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    fetchAppointments();
+                    appointmentForm.reset();
+                } else {
+                    alert(`Error adding appointment: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        }
-    });
+        });
+    }
 
-    appointmentList.addEventListener('click', (e) => {
-        const target = e.target.closest('.edit-btn, .delete-btn');
-        if (!target) return;
+    if(appointmentList) {
+        appointmentList.addEventListener('click', (e) => {
+            const target = e.target.closest('.edit-btn, .delete-btn');
+            if (!target) return;
 
-        const appointmentId = target.dataset.id;
-        console.log(`Button clicked for appointment ID: ${appointmentId}`);
-
-        if (target.classList.contains('edit-btn')) {
-            console.log('Edit button clicked');
-            openEditModal(appointmentId);
-        }
-
-        if (target.classList.contains('delete-btn')) {
-            console.log('Delete button clicked');
-            if(confirm('Are you sure you want to delete this appointment?')) {
-                deleteAppointment(appointmentId);
+            const appointmentId = target.dataset.id;
+            
+            if (target.classList.contains('edit-btn')) {
+                openEditModal(appointmentId);
             }
-        }
-    });
 
+            if (target.classList.contains('delete-btn')) {
+                if(confirm('Are you sure you want to delete this appointment?')) {
+                    deleteAppointment(appointmentId);
+                }
+            }
+        });
+    }
 
     function openEditModal(appointmentId) {
         const appointment = appointments.find(app => app.id == appointmentId);
@@ -258,38 +279,39 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit_status').value = appointment.status;
             document.getElementById('edit_notes').value = appointment.notes;
             editModal.classList.remove('hidden');
-        } else {
-            console.error(`Appointment with ID ${appointmentId} not found.`);
         }
     }
 
+    if(cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            if(editModal) editModal.classList.add('hidden');
+        });
+    }
 
-    cancelEditBtn.addEventListener('click', () => {
-        editModal.classList.add('hidden');
-    });
+    if(editAppointmentForm) {
+        editAppointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(editAppointmentForm);
+            
+            try {
+                const response = await fetch('php/update_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
 
-    editAppointmentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(editAppointmentForm);
-        
-        try {
-            const response = await fetch('php/update_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                editModal.classList.add('hidden');
-                fetchAppointments();
-            } else {
-                alert(`Error updating appointment: ${result.message}`);
+                if (result.success) {
+                    if(editModal) editModal.classList.add('hidden');
+                    fetchAppointments();
+                } else {
+                    alert(`Error updating appointment: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while updating. Please try again.');
-        }
-    });
+        });
+    }
 
     async function deleteAppointment(appointmentId) {
         try {
@@ -313,5 +335,17 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('An error occurred while deleting. Please try again.');
         }
     }
-});
+}
+
+function initializeProfilePage() {
+    // All profile-specific JavaScript code goes here.
+    // This function can be defined in profile.js if you create it.
+    console.log("Profile page initialized");
+}
+
+function initializeAuthPage() {
+    // All authentication (login/register) JavaScript code goes here.
+    // This function can be defined in auth.js if you create it.
+    console.log("Auth page initialized");
+}
 
