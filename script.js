@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // This wrapper ensures the script runs only after the page is fully loaded.
 
     // --- Page Check ---
-    // This script is intended ONLY for the main dashboard page (index.html).
-    // The check below ensures it exits gracefully if loaded on another page.
+    // This is a safety measure to ensure this script only runs on the main dashboard page.
     const appointmentForm = document.getElementById('appointmentForm');
     if (!appointmentForm) {
-        return; // Exit if not on the main dashboard page
+        // If the main form isn't found, stop running the script.
+        return; 
     }
 
     // --- DOM Element Selection ---
@@ -22,68 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelEditBtn = document.getElementById('cancelEdit');
 
     let currentDate = new Date();
-    let appointments = [];
+    let appointments = []; // This will store the fetched appointments
 
-    // --- Rendering Functions (Defined First) ---
+    // --- Rendering Functions: Defined first to avoid initialization errors ---
 
-    function createAppointmentCard(app) {
-        const card = document.createElement('div');
-        card.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-start';
-        card.dataset.id = app.id;
-
-        const statusColors = {
-            'Scheduled': 'bg-blue-100 text-blue-800',
-            'Completed': 'bg-green-100 text-green-800',
-            'Canceled': 'bg-red-100 text-red-800'
-        };
-
-        card.innerHTML = `
-            <div class="flex-grow">
-                <p class="font-bold text-lg text-gray-800">${app.patient_name}</p>
-                <p class="text-sm text-gray-600 mb-3">with Dr. ${app.doctor_name}</p>
-                <div class="text-sm space-y-2">
-                    <div class="flex items-center text-gray-500"><i data-lucide="calendar" class="h-4 w-4 mr-2"></i><span>${new Date(app.date + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
-                    <div class="flex items-center text-gray-500"><i data-lucide="clock" class="h-4 w-4 mr-2"></i><span>${new Date('1970-01-01T' + app.time).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true })}</span></div>
-                    <div class="flex items-center text-gray-500"><i data-lucide="info" class="h-4 w-4 mr-2"></i><span>Notes: ${app.notes || 'N/A'}</span></div>
-                </div>
-            </div>
-            <div class="flex flex-col items-end space-y-3">
-                <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}">${app.status}</span>
-                <div class="flex space-x-2">
-                    <button class="edit-btn p-2 text-gray-500 hover:text-blue-600" data-id="${app.id}"><i data-lucide="edit-2" class="h-5 w-5 pointer-events-none"></i></button>
-                    <button class="delete-btn p-2 text-gray-500 hover:text-red-600" data-id="${app.id}"><i data-lucide="trash-2" class="h-5 w-5 pointer-events-none"></i></button>
-                </div>
-            </div>
-        `;
-        return card;
-    }
-
-    function renderAppointments() {
-        appointmentList.innerHTML = '';
-        if (appointments.length === 0) {
-            emptyState.style.display = 'block';
-        } else {
-            appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-            appointments.forEach(app => {
-                appointmentList.appendChild(createAppointmentCard(app));
-            });
-        }
-        if (window.lucide) {
-            lucide.createIcons();
-        }
-    }
-
-    function renderCalendar() {
+    // Render the monthly calendar
+    const renderCalendar = () => {
+        if (!calendarDaysEl) return; // Safety check
         calendarDaysEl.innerHTML = '';
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
         monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
 
-        const firstDay = new Date(year, month, 1).getDay();
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < firstDayOfMonth; i++) {
             calendarDaysEl.innerHTML += '<div></div>';
         }
 
@@ -106,11 +61,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
             calendarDaysEl.appendChild(dayEl);
         }
-    }
+    };
 
-    // --- Data Fetching and Core Logic ---
+    // Create the HTML for a single appointment card
+    const createAppointmentCard = (app) => {
+        const card = document.createElement('div');
+        card.className = 'appointment-card';
+        card.dataset.id = app.id;
 
-    async function fetchAppointments() {
+        card.innerHTML = `
+            <div class="appointment-card-body">
+                <p class="patient-name">${app.patient_name}</p>
+                <p class="doctor-name">with Dr. ${app.doctor_name}</p>
+                <div class="appointment-details">
+                    <p><strong>Date:</strong> ${app.date}</p>
+                    <p><strong>Time:</strong> ${app.time}</p>
+                    <p><strong>Notes:</strong> ${app.notes || 'N/A'}</p>
+                </div>
+            </div>
+            <div class="appointment-card-aside">
+                <span class="status-tag status-${(app.status || 'scheduled').toLowerCase()}">${app.status || 'Scheduled'}</span>
+                <div class="appointment-actions">
+                    <button class="icon-button edit-btn" data-id="${app.id}">Edit</button>
+                    <button class="icon-button delete-btn" data-id="${app.id}">Delete</button>
+                </div>
+            </div>
+        `;
+        return card;
+    };
+
+    // Render all appointment cards
+    const renderAppointments = () => {
+        if (!appointmentList) return; // Safety check
+        appointmentList.innerHTML = ''; 
+        if (appointments.length === 0) {
+            emptyState.style.display = 'block'; 
+        } else {
+            emptyState.style.display = 'none';
+            appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+            appointments.forEach(app => {
+                appointmentList.appendChild(createAppointmentCard(app));
+            });
+        }
+    };
+
+    // --- Core Functions: Data Fetching and Session Management ---
+    
+    // Fetch appointments from the server
+    const fetchAppointments = async () => {
+        if (!loadingState || !emptyState || !appointmentList) return; // Safety check
         loadingState.style.display = 'block';
         emptyState.style.display = 'none';
         appointmentList.innerHTML = '';
@@ -130,11 +129,12 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching appointments:', error);
             alert('An error occurred while fetching appointments.');
         } finally {
-            loadingState.style.display = 'none';
+            if (loadingState) loadingState.style.display = 'none';
         }
-    }
+    };
 
-    async function checkLoginStatus() {
+    // Check if the user is logged in
+    const checkLoginStatus = async () => {
         try {
             const response = await fetch('php/check_session.php');
             const session = await response.json();
@@ -143,13 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userInfoDiv) {
                     userInfoDiv.innerHTML = `
                         <p>
-                            Welcome, <span class="font-semibold text-gray-800">${session.username}</span> |
-                            <a href="profile.html" class="text-blue-600 hover:underline">Profile</a> |
-                            <a href="php/logout.php" class="text-blue-600 hover:underline">Logout</a>
+                            Welcome, <span class="font-semibold">${session.username}</span> |
+                            <a href="profile.html" class="link">Profile</a> |
+                            <a href="php/logout.php" class="link">Logout</a>
                         </p>
                     `;
                 }
-                fetchAppointments();
+                fetchAppointments(); 
             } else {
                 window.location.href = 'login.html';
             }
@@ -157,6 +157,41 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Session check failed:", error);
             window.location.href = 'login.html';
         }
+    };
+
+    // --- Event Listeners and Form Handlers ---
+
+    appointmentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(appointmentForm);
+        try {
+            const response = await fetch('php/add_appointment.php', { method: 'POST', body: formData });
+            const result = await response.json();
+            if (result.success) {
+                fetchAppointments(); 
+                appointmentForm.reset();
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+        }
+    });
+
+    if (appointmentList) {
+        appointmentList.addEventListener('click', (e) => {
+            const editButton = e.target.closest('.edit-btn');
+            const deleteButton = e.target.closest('.delete-btn');
+
+            if (editButton) {
+                openEditModal(editButton.dataset.id);
+            }
+            if (deleteButton) {
+                if (confirm('Are you sure you want to delete this appointment?')) {
+                    deleteAppointment(deleteButton.dataset.id);
+                }
+            }
+        });
     }
 
     function openEditModal(appointmentId) {
@@ -169,95 +204,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit_appointment_time').value = appointment.time;
             document.getElementById('edit_status').value = appointment.status;
             document.getElementById('edit_notes').value = appointment.notes;
-            editModal.classList.remove('hidden');
+            if (editModal) editModal.classList.remove('hidden');
         }
     }
+    
+    // **THIS IS THE MAIN FIX** - Add event listeners only if the elements exist
+    if (cancelEditBtn && editAppointmentForm) {
+        cancelEditBtn.addEventListener('click', () => editModal.classList.add('hidden'));
 
-    async function deleteAppointment(appointmentId) {
-        try {
-            const formData = new FormData();
-            formData.append('appointment_id', appointmentId);
-
-            const response = await fetch('php/delete_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                fetchAppointments();
-            } else {
-                alert(`Error deleting appointment: ${result.message}`);
-            }
-        } catch (error) {
-            alert('An error occurred while deleting.');
-        }
-    }
-
-    // --- Event Listeners ---
-
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
-    });
-
-    appointmentForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(appointmentForm);
-
-        try {
-            const response = await fetch('php/add_appointment.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.success) {
-                fetchAppointments();
-                appointmentForm.reset();
-            } else {
-                alert(`Error: ${result.message}`);
-            }
-        } catch (error) {
-            alert('An error occurred. Please try again.');
-        }
-    });
-
-    appointmentList.addEventListener('click', (e) => {
-        const editButton = e.target.closest('.edit-btn');
-        const deleteButton = e.target.closest('.delete-btn');
-
-        if (editButton) {
-            openEditModal(editButton.dataset.id);
-        }
-        if (deleteButton) {
-            if (confirm('Are you sure you want to delete this appointment?')) {
-                deleteAppointment(deleteButton.dataset.id);
-            }
-        }
-    });
-
-    // Defensive check for modal buttons
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', () => {
-            editModal.classList.add('hidden');
-        });
-    }
-
-    if (editAppointmentForm) {
         editAppointmentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(editAppointmentForm);
-
             try {
-                const response = await fetch('php/update_appointment.php', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch('php/update_appointment.php', { method: 'POST', body: formData });
                 const result = await response.json();
                 if (result.success) {
                     editModal.classList.add('hidden');
@@ -270,7 +229,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    async function deleteAppointment(appointmentId) {
+        try {
+            const formData = new FormData();
+            formData.append('appointment_id', appointmentId);
+            const response = await fetch('php/delete_appointment.php', { method: 'POST', body: formData });
+            const result = await response.json();
+            if (result.success) {
+                fetchAppointments();
+            } else {
+                alert(`Error deleting appointment: ${result.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred while deleting.');
+        }
+    }
+
+    if (prevMonthBtn && nextMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
     // --- Initial Load ---
-    checkLoginStatus();
+    checkLoginStatus(); 
 });
+

@@ -3,7 +3,6 @@ session_start();
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'User not authenticated']);
     exit();
@@ -11,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// CORRECTED: Added the 'status' column to the SELECT statement
+// This query includes the 'status' column, which is crucial for the frontend script.
 $sql = "SELECT id, patient_name, doctor_name, date, time, notes, status FROM appointments WHERE user_id = ? ORDER BY date, time";
 $stmt = $conn->prepare($sql);
 
