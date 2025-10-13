@@ -16,12 +16,12 @@
         <header class="text-center mb-8 md:mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900">Your Dashboard</h1>
             <div id="user-info" class="mt-3 text-gray-600">
-                <!-- User info will be injected here by script.js -->
+                <!-- User info will be injected here -->
             </div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column: Add Appointment & Calendar -->
+            <!-- Left Column -->
             <div class="lg:col-span-1 space-y-8">
                 <!-- Add Appointment Form -->
                 <div class="bg-white p-6 rounded-2xl shadow-lg">
@@ -30,6 +30,7 @@
                         Set a New Reminder
                     </h2>
                     <form id="appointmentForm" class="space-y-4">
+                        <!-- Form fields -->
                         <div>
                             <label for="patient_name" class="form-label">Patient Name</label>
                             <input type="text" id="patient_name" name="patient_name" required class="form-input">
@@ -58,9 +59,7 @@
                             <label for="notes" class="form-label">Notes / Reason for Visit</label>
                             <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="e.g., Annual Checkup"></textarea>
                         </div>
-                        <button type="submit" class="button-primary w-full">
-                            Set Reminder
-                        </button>
+                        <button type="submit" class="button-primary w-full">Set Reminder</button>
                     </form>
                 </div>
 
@@ -75,28 +74,19 @@
                         <div class="calendar-grid text-center text-sm font-medium text-gray-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="calendar-grid text-center">
-                            <!-- Calendar days will be generated here -->
-                        </div>
+                        <div id="calendarDays" class="calendar-grid text-center"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Upcoming Appointments -->
+            <!-- Right Column -->
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-2xl shadow-lg min-h-full">
                     <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-3">Upcoming Appointments</h2>
                     <div id="appointmentList" class="space-y-4">
-                        <!-- Appointments will be rendered here -->
-                        <div id="loadingState" class="text-center py-10">
-                            <p class="text-gray-500">Loading appointments...</p>
-                        </div>
-                         <div id="emptyState" class="hidden text-center py-10 px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <h3 class="mt-2 text-lg font-medium text-gray-900">No appointments scheduled</h3>
-                            <p class="mt-1 text-sm text-gray-500">Use the form on the left to add a new reminder.</p>
+                        <div id="loadingState" class="text-center py-10"><p class="text-gray-500">Loading appointments...</p></div>
+                        <div id="emptyState" class="hidden text-center py-10 px-4">
+                            <!-- Empty state SVG and text -->
                         </div>
                     </div>
                 </div>
@@ -111,7 +101,8 @@
             <form id="editAppointmentForm">
                 <input type="hidden" id="edit_appointment_id" name="appointment_id">
                 <div class="space-y-4">
-                     <div>
+                    <!-- Edit form fields -->
+                    <div>
                         <label for="edit_patient_name" class="form-label">Patient Name</label>
                         <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
                     </div>
