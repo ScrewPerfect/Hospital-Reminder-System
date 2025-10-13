@@ -7,7 +7,75 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.5rem;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .button-primary {
+            background-color: #2563EB;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .button-primary:hover {
+            background-color: #1D4ED8;
+        }
+        .button-secondary {
+            background-color: #E5E7EB;
+            color: #374151;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .button-secondary:hover {
+            background-color: #D1D5DB;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        .calendar-day {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 2.5rem;
+            width: 2.5rem;
+            border-radius: 9999px;
+            cursor: default;
+        }
+        .calendar-day.today {
+            background-color: #2563EB;
+            color: white;
+        }
+        .calendar-day.has-appointment {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+            font-weight: bold;
+        }
+        .status-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 
@@ -72,10 +140,10 @@
                             <h3 id="monthYear" class="text-lg font-semibold text-gray-800"></h3>
                             <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">&gt;</button>
                         </div>
-                        <div class="grid calendar-grid text-center text-sm font-medium text-gray-500">
+                        <div class="calendar-grid text-center text-sm font-medium text-gray-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="grid calendar-grid text-center">
+                        <div id="calendarDays" class="calendar-grid text-center items-center justify-center">
                             <!-- Calendar days will be generated here -->
                         </div>
                     </div>

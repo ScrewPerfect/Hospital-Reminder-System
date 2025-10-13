@@ -14,6 +14,7 @@
     border-radius: 0.5rem;
     transition: all 0.3s ease;
 }
+
 .form-input:focus {
     ring: 2px;
     ring-color: #3b82f6;

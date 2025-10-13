@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userInfoDiv) {
                     userInfoDiv.innerHTML = `
                         <p>
-                            Welcome, <span class="font-semibold text-gray-800">${session.username}</span> | 
-                            <a href="profile.html" class="text-blue-600 hover:underline">Profile</a> | 
-                            <a href="php/logout.php" class="text-blue-600 hover:underline">Logout</a>
+                            Welcome, <strong>${session.username}</strong> | 
+                            <a href="profile.html">Profile</a> | 
+                            <a href="php/logout.php">Logout</a>
                         </p>
                     `;
                 }
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAppointments() {
         loadingState.style.display = 'block';
-        emptyState.style.display = 'none';
+        emptyState.classList.add('hidden');
         appointmentList.innerHTML = '';
 
         try {
@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error fetching appointments:', error);
+            loadingState.style.display = 'none';
+            emptyState.classList.remove('hidden');
             alert('An error occurred while fetching appointments.');
         } finally {
             loadingState.style.display = 'none';
@@ -72,68 +74,44 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAppointments() {
         appointmentList.innerHTML = '';
         if (appointments.length === 0) {
-            emptyState.style.display = 'block';
+            emptyState.classList.remove('hidden');
         } else {
-            emptyState.style.display = 'none';
+            emptyState.classList.add('hidden');
             appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
             appointments.forEach(app => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
-        // Re-initialize lucide icons
         lucide.createIcons();
     }
     
     function createAppointmentCard(app) {
         const card = document.createElement('div');
-        card.className = 'appointment-card';
+        card.className = 'appointment-card card';
         card.dataset.id = app.id;
-
-        const statusColors = {
-            'Scheduled': 'bg-blue-100 text-blue-800',
-            'Completed': 'bg-green-100 text-green-800',
-            'Canceled': 'bg-red-100 text-red-800'
-        };
 
         const countdown = calculateCountdown(app.date, app.time);
 
         card.innerHTML = `
-            <div class="flex-grow">
-                <div class="flex items-center mb-2">
-                    <i data-lucide="user" class="h-5 w-5 text-gray-500 mr-3"></i>
-                    <p class="font-bold text-lg text-gray-800">${app.patient_name}</p>
-                </div>
-                <div class="flex items-center text-sm text-gray-600 mb-4">
-                    <i data-lucide="stethoscope" class="h-5 w-5 text-gray-500 mr-3"></i>
-                    <p>with Dr. ${app.doctor_name}</p>
-                </div>
-                <div class="text-sm space-y-2">
-                    <div class="flex items-center">
-                        <i data-lucide="calendar" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <span>${new Date(app.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i data-lucide="clock" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <span>${new Date('1970-01-01T' + app.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                    </div>
-                     <div class="flex items-center">
-                        <i data-lucide="info" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <p class="flex-1">Notes: <span class="text-gray-800">${app.notes || 'N/A'}</span></p>
-                    </div>
-                </div>
+            <div class="countdown">
+                <div class="countdown-timer">${countdown}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">left</div>
             </div>
-            <div class="flex flex-col items-center justify-between ml-4">
-                <div class="text-center mb-4">
-                    <span class="countdown-timer">${countdown}</span>
-                    <span class="text-xs text-gray-500 block">left</span>
-                </div>
-                <span class="status-tag ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}">${app.status}</span>
-                 <div class="flex space-x-2 mt-4">
+            <div style="flex-grow: 1;">
+                <p style="font-weight: 700; font-size: 1.125rem;">${app.patient_name}</p>
+                <p style="color: #6b7280; margin-bottom: 1rem;">with Dr. ${app.doctor_name}</p>
+                <p><strong>Date:</strong> ${new Date(app.date + 'T00:00:00').toLocaleDateString()}</p>
+                <p><strong>Time:</strong> ${new Date('1970-01-01T' + app.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                <p><strong>Notes:</strong> ${app.notes || 'N/A'}</p>
+            </div>
+            <div>
+                <div class="status-tag status-${app.status}">${app.status}</div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
                     <button class="edit-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="edit-2" class="h-5 w-5"></i>
+                        <i data-lucide="edit-2"></i>
                     </button>
                     <button class="delete-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="trash-2" class="h-5 w-5"></i>
+                        <i data-lucide="trash-2"></i>
                     </button>
                 </div>
             </div>
@@ -149,11 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diff < 0) return "Past";
 
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
         if (days > 0) return `${days}d`;
+        
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         if (hours > 0) return `${hours}h`;
+
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         return `${minutes}m`;
     }
 
@@ -176,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dayEl = document.createElement('div');
             dayEl.textContent = day;
-            dayEl.classList.add('calendar-day');
+            dayEl.className = 'calendar-day';
             
             const today = new Date();
             if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
@@ -185,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             if (appointmentDates.includes(currentDateStr)) {
-                console.log(`Appointment found for ${currentDateStr}`);
                 dayEl.classList.add('has-appointment');
             }
             
@@ -231,15 +209,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!target) return;
 
         const appointmentId = target.dataset.id;
-        console.log(`Button clicked for appointment ID: ${appointmentId}`);
 
         if (target.classList.contains('edit-btn')) {
-            console.log('Edit button clicked');
             openEditModal(appointmentId);
         }
 
         if (target.classList.contains('delete-btn')) {
-            console.log('Delete button clicked');
             if(confirm('Are you sure you want to delete this appointment?')) {
                 deleteAppointment(appointmentId);
             }
