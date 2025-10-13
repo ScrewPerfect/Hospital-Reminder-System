@@ -1,10 +1,43 @@
-.appointment-card {
-    transition: all 0.3s ease;
+/* --- Global Styles & Layout --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #1f2937;
+    margin: 0;
+    padding: 2rem;
 }
 
-.appointment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #334155;
+}
+
+/* --- Card Styles --- */
+.card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Form & Button Styles --- */
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
 }
 
 .form-input {
@@ -12,101 +45,118 @@
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
-    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-.form-input:focus {
-    ring: 2px;
-    ring-color: #3b82f6;
-    border-color: #3b82f6;
-}
-
-.form-button {
+.button-primary {
     width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
     background-color: #2563eb;
     color: white;
     font-weight: 600;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-    transform: scale(1);
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
-.form-button:hover {
+.button-primary:hover {
     background-color: #1d4ed8;
-    transform: scale(1.05);
 }
 
-.form-button-secondary {
+.button-secondary {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
     background-color: #e5e7eb;
-    color: #374151;
+    color: #1f2937;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
-
-.form-button-secondary:hover {
+.button-secondary:hover {
     background-color: #d1d5db;
 }
 
-/* Modal Styles */
-.modal {
-    transition: opacity 0.3s ease;
+
+/* --- Dashboard Specific Styles --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
 }
-.modal-content {
-    transition: transform 0.3s ease;
-    transform: translateY(-20px);
-}
-#editModal:not(.hidden) .modal-content {
-    transform: translateY(0);
+@media (min-width: 1024px) {
+    .main-grid {
+        grid-template-columns: 1fr 2fr;
+    }
 }
 
-/* Status Tag Styles */
+.appointment-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
 .status-tag {
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
+.status-scheduled { background-color: #dbeafe; color: #1e40af; }
+.status-completed { background-color: #d1fae5; color: #065f46; }
+.status-canceled { background-color: #fee2e2; color: #991b1b; }
 
-.status-scheduled {
-    background-color: #dbeafe;
-    color: #1e40af;
-}
 
-.status-completed {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.status-canceled {
-    background-color: #fee2e2;
-    color: #991b1b;
-}
-
-/* Calendar Styles */
+/* --- Calendar Styles --- */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
     text-align: center;
 }
-
 .calendar-day {
     padding: 0.5rem;
     border-radius: 9999px;
-    transition: all 0.2s ease;
-    cursor: default;
 }
-
 .calendar-day.today {
     background-color: #2563eb;
     color: white;
 }
-
 .calendar-day.has-appointment {
     font-weight: bold;
-    background-color: #dbeafe;
+    background-color: #bfdbfe;
     color: #1e40af;
 }
 
-/* ... any other existing styles ... */
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* --- Authentication Pages --- */
+.auth-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+}
 

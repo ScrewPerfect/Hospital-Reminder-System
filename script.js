@@ -1,29 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Defensive Check: This script is for the main dashboard page (index.html).
-    // If it can't find the main appointment form, it will stop running to prevent errors on other pages.
-    if (!document.getElementById('appointmentForm')) {
+    // This wrapper ensures the script runs only after the page is fully loaded, preventing errors.
+
+    // --- Page Check ---
+    // This script is for the main dashboard page (index.html). 
+    // If it's not the dashboard, it will stop running to avoid errors on other pages.
+    const appointmentForm = document.getElementById('appointmentForm');
+    if (!appointmentForm) {
         return; 
     }
 
     // --- DOM Element Selection ---
-    const appointmentForm = document.getElementById('appointmentForm');
     const appointmentList = document.getElementById('appointmentList');
     const loadingState = document.getElementById('loadingState');
     const emptyState = document.getElementById('emptyState');
-    const userInfoDiv = document.getElementById('user-info');
-
-    // Calendar elements
+    
     const monthYearEl = document.getElementById('monthYear');
     const calendarDaysEl = document.getElementById('calendarDays');
     const prevMonthBtn = document.getElementById('prevMonth');
     const nextMonthBtn = document.getElementById('nextMonth');
 
-    // Edit Modal Elements
     const editModal = document.getElementById('editModal');
     const editAppointmentForm = document.getElementById('editAppointmentForm');
     const cancelEditBtn = document.getElementById('cancelEdit');
 
-    // --- State Management ---
     let currentDate = new Date();
     let appointments = [];
 
@@ -34,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/check_session.php');
             const session = await response.json();
             if (session.loggedIn) {
+                const userInfoDiv = document.getElementById('user-info');
                 if (userInfoDiv) {
                     userInfoDiv.innerHTML = `
                         <p>
@@ -54,9 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchAppointments() {
-        if(loadingState) loadingState.style.display = 'block';
-        if(emptyState) emptyState.style.display = 'none';
-        if(appointmentList) appointmentList.innerHTML = '';
+        loadingState.style.display = 'block';
+        emptyState.style.display = 'none';
+        appointmentList.innerHTML = '';
 
         try {
             const response = await fetch(`./php/get_appointments.php?t=${new Date().getTime()}`);
@@ -73,107 +73,61 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching appointments:', error);
             alert('An error occurred while fetching appointments.');
         } finally {
-            if(loadingState) loadingState.style.display = 'none';
+            loadingState.style.display = 'none';
         }
     }
 
     function renderAppointments() {
-        if (!appointmentList) return;
         appointmentList.innerHTML = '';
         if (appointments.length === 0) {
-            if(emptyState) emptyState.style.display = 'block';
+            emptyState.style.display = 'block';
         } else {
-            if(emptyState) emptyState.style.display = 'none';
             appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
             appointments.forEach(app => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        lucide.createIcons();
     }
     
     function createAppointmentCard(app) {
         const card = document.createElement('div');
-        card.className = 'appointment-card';
+        card.className = 'bg-white p-4 rounded-lg shadow flex justify-between items-start';
         card.dataset.id = app.id;
 
         const statusColors = {
-            'Scheduled': 'status-scheduled',
-            'Completed': 'status-completed',
-            'Canceled': 'status-canceled'
+            'Scheduled': 'bg-blue-100 text-blue-800',
+            'Completed': 'bg-green-100 text-green-800',
+            'Canceled': 'bg-red-100 text-red-800'
         };
-
-        const countdown = calculateCountdown(app.date, app.time);
 
         card.innerHTML = `
             <div class="flex-grow">
-                <div class="flex items-center mb-2">
-                    <i data-lucide="user" class="h-5 w-5 text-gray-500 mr-3"></i>
-                    <p class="font-bold text-lg text-gray-800">${app.patient_name}</p>
-                </div>
-                <div class="flex items-center text-sm text-gray-600 mb-4">
-                    <i data-lucide="stethoscope" class="h-5 w-5 text-gray-500 mr-3"></i>
-                    <p>with Dr. ${app.doctor_name}</p>
-                </div>
+                <p class="font-bold text-lg text-gray-800">${app.patient_name}</p>
+                <p class="text-sm text-gray-600 mb-3">with Dr. ${app.doctor_name}</p>
                 <div class="text-sm space-y-2">
-                    <div class="flex items-center">
-                        <i data-lucide="calendar" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <span>${new Date(app.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i data-lucide="clock" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <span>${new Date('1970-01-01T' + app.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                    </div>
-                     <div class="flex items-center">
-                        <i data-lucide="info" class="h-5 w-5 text-gray-500 mr-3"></i>
-                        <p class="flex-1">Notes: <span class="text-gray-800">${app.notes || 'N/A'}</span></p>
-                    </div>
+                    <div class="flex items-center text-gray-500"><i data-lucide="calendar" class="h-4 w-4 mr-2"></i><span>${new Date(app.date + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
+                    <div class="flex items-center text-gray-500"><i data-lucide="clock" class="h-4 w-4 mr-2"></i><span>${new Date('1970-01-01T' + app.time).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true })}</span></div>
+                    <div class="flex items-center text-gray-500"><i data-lucide="info" class="h-4 w-4 mr-2"></i><span>Notes: ${app.notes || 'N/A'}</span></div>
                 </div>
             </div>
-            <div class="flex flex-col items-center justify-between ml-4">
-                <div class="text-center mb-4">
-                    <span class="countdown-timer">${countdown}</span>
-                    <span class="text-xs text-gray-500 block">left</span>
-                </div>
-                <span class="status-tag ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}">${app.status}</span>
-                 <div class="flex space-x-2 mt-4">
-                    <button class="edit-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="edit-2" class="h-5 w-5"></i>
-                    </button>
-                    <button class="delete-btn icon-button" data-id="${app.id}">
-                        <i data-lucide="trash-2" class="h-5 w-5"></i>
-                    </button>
+            <div class="flex flex-col items-end space-y-3">
+                <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[app.status] || 'bg-gray-100 text-gray-800'}">${app.status}</span>
+                <div class="flex space-x-2">
+                    <button class="edit-btn p-2 text-gray-500 hover:text-blue-600" data-id="${app.id}"><i data-lucide="edit-2" class="h-5 w-5 pointer-events-none"></i></button>
+                    <button class="delete-btn p-2 text-gray-500 hover:text-red-600" data-id="${app.id}"><i data-lucide="trash-2" class="h-5 w-5 pointer-events-none"></i></button>
                 </div>
             </div>
         `;
         return card;
     }
 
-     function calculateCountdown(date, time) {
-        const appointmentTime = new Date(`${date}T${time}`);
-        const now = new Date();
-        const diff = appointmentTime - now;
-
-        if (diff < 0) return "Past";
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-        if (days > 0) return `${days}d`;
-        if (hours > 0) return `${hours}h`;
-        return `${minutes}m`;
-    }
-
     function renderCalendar() {
-        if (!calendarDaysEl) return;
         calendarDaysEl.innerHTML = '';
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
 
-        if(monthYearEl) monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -203,62 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (prevMonthBtn) {
-        prevMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
-    }
-
-    if (nextMonthBtn) {
-        nextMonthBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
-    }
-
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(appointmentForm);
-            
-            try {
-                const response = await fetch('php/add_appointment.php', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.success) {
-                    fetchAppointments();
-                    appointmentForm.reset();
-                } else {
-                    alert(`Error adding appointment: ${result.message}`);
-                }
-            } catch (error) {
-                alert('An error occurred. Please try again.');
-            }
-        });
-    }
-
-    if (appointmentList) {
-        appointmentList.addEventListener('click', (e) => {
-            const target = e.target.closest('.edit-btn, .delete-btn');
-            if (!target) return;
-
-            const appointmentId = target.dataset.id;
-            
-            if (target.classList.contains('edit-btn')) {
-                openEditModal(appointmentId);
-            }
-
-            if (target.classList.contains('delete-btn')) {
-                if(confirm('Are you sure you want to delete this appointment?')) {
-                    deleteAppointment(appointmentId);
-                }
-            }
-        });
-    }
-
     function openEditModal(appointmentId) {
         const appointment = appointments.find(app => app.id == appointmentId);
-        if (appointment && editModal) {
+        if (appointment) {
             document.getElementById('edit_appointment_id').value = appointment.id;
             document.getElementById('edit_patient_name').value = appointment.patient_name;
             document.getElementById('edit_doctor_name').value = appointment.doctor_name;
@@ -270,9 +171,77 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function deleteAppointment(appointmentId) {
+        try {
+            const formData = new FormData();
+            formData.append('appointment_id', appointmentId);
+
+            const response = await fetch('php/delete_appointment.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                fetchAppointments();
+            } else {
+                alert(`Error deleting appointment: ${result.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred while deleting.');
+        }
+    }
+
+    // --- Event Listeners ---
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    appointmentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(appointmentForm);
+        
+        try {
+            const response = await fetch('php/add_appointment.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (result.success) {
+                fetchAppointments();
+                appointmentForm.reset();
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred. Please try again.');
+        }
+    });
+
+    appointmentList.addEventListener('click', (e) => {
+        const editButton = e.target.closest('.edit-btn');
+        const deleteButton = e.target.closest('.delete-btn');
+
+        if (editButton) {
+            openEditModal(editButton.dataset.id);
+        }
+        if (deleteButton) {
+            if(confirm('Are you sure you want to delete this appointment?')) {
+                deleteAppointment(deleteButton.dataset.id);
+            }
+        }
+    });
+
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', () => {
-            if (editModal) editModal.classList.add('hidden');
+            editModal.classList.add('hidden');
         });
     }
 
@@ -282,37 +251,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(editAppointmentForm);
             
             try {
-                const response = await fetch('php/update_appointment.php', { method: 'POST', body: formData });
+                const response = await fetch('php/update_appointment.php', {
+                    method: 'POST',
+                    body: formData
+                });
                 const result = await response.json();
-
                 if (result.success) {
-                    if (editModal) editModal.classList.add('hidden');
+                    editModal.classList.add('hidden');
                     fetchAppointments();
                 } else {
-                    alert(`Error updating appointment: ${result.message}`);
+                    alert(`Error updating: ${result.message}`);
                 }
             } catch (error) {
-                alert('An error occurred while updating. Please try again.');
+                alert('An error occurred while updating.');
             }
         });
-    }
-
-    async function deleteAppointment(appointmentId) {
-        try {
-             const formData = new FormData();
-             formData.append('id', appointmentId);
-
-            const response = await fetch('php/delete_appointment.php', { method: 'POST', body: formData });
-            const result = await response.json();
-
-            if (result.success) {
-                fetchAppointments();
-            } else {
-                alert(`Error deleting appointment: ${result.message}`);
-            }
-        } catch (error) {
-            alert('An error occurred while deleting. Please try again.');
-        }
     }
 
     // --- Initial Load ---

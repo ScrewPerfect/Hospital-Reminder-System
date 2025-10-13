@@ -15,13 +15,12 @@
         <!-- Header -->
         <header class="text-center mb-8 md:mb-12">
             <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900">Your Dashboard</h1>
-            <div id="user-info" class="mt-3 text-gray-600">
-                <!-- User info will be injected here -->
-            </div>
+            <!-- User info will be injected here by script.js -->
+            <div id="user-info" class="mt-3 text-gray-600"></div>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column -->
+            <!-- Left Column: Add Appointment & Calendar -->
             <div class="lg:col-span-1 space-y-8">
                 <!-- Add Appointment Form -->
                 <div class="bg-white p-6 rounded-2xl shadow-lg">
@@ -30,36 +29,37 @@
                         Set a New Reminder
                     </h2>
                     <form id="appointmentForm" class="space-y-4">
-                        <!-- Form fields -->
                         <div>
-                            <label for="patient_name" class="form-label">Patient Name</label>
-                            <input type="text" id="patient_name" name="patient_name" required class="form-input">
+                            <label for="patient_name" class="text-sm font-medium text-gray-600">Patient Name</label>
+                            <input type="text" id="patient_name" name="patient_name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                         </div>
                         <div>
-                            <label for="doctor_name" class="form-label">Doctor's Name</label>
-                            <input type="text" id="doctor_name" name="doctor_name" required class="form-input">
+                            <label for="doctor_name" class="text-sm font-medium text-gray-600">Doctor's Name</label>
+                            <input type="text" id="doctor_name" name="doctor_name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                         </div>
                         <div>
-                            <label for="appointment_date" class="form-label">Appointment Date</label>
-                            <input type="date" id="appointment_date" name="appointment_date" required class="form-input">
+                            <label for="appointment_date" class="text-sm font-medium text-gray-600">Appointment Date</label>
+                            <input type="date" id="appointment_date" name="appointment_date" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                         </div>
                          <div>
-                            <label for="appointment_time" class="form-label">Appointment Time</label>
-                            <input type="time" id="appointment_time" name="appointment_time" required class="form-input">
+                            <label for="appointment_time" class="text-sm font-medium text-gray-600">Appointment Time</label>
+                            <input type="time" id="appointment_time" name="appointment_time" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                         </div>
                         <div>
-                            <label for="status" class="form-label">Status</label>
-                            <select id="status" name="status" required class="form-input">
+                            <label for="status" class="text-sm font-medium text-gray-600">Status</label>
+                            <select id="status" name="status" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                                 <option value="Scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
                                 <option value="Canceled">Canceled</option>
                             </select>
                         </div>
                         <div>
-                            <label for="notes" class="form-label">Notes / Reason for Visit</label>
-                            <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="e.g., Annual Checkup"></textarea>
+                            <label for="notes" class="text-sm font-medium text-gray-600">Notes / Reason for Visit</label>
+                            <textarea id="notes" name="notes" rows="3" class="mt-1 w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g., Annual Checkup"></textarea>
                         </div>
-                        <button type="submit" class="button-primary w-full">Set Reminder</button>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700">
+                            Set Reminder
+                        </button>
                     </form>
                 </div>
 
@@ -74,19 +74,24 @@
                         <div class="calendar-grid text-center text-sm font-medium text-gray-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="calendar-grid text-center"></div>
+                        <div id="calendarDays" class="calendar-grid text-center">
+                            <!-- Calendar days will be generated here -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
+            <!-- Right Column: Upcoming Appointments -->
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-2xl shadow-lg min-h-full">
                     <h2 class="text-2xl font-semibold mb-6 text-gray-800 border-b pb-3">Upcoming Appointments</h2>
                     <div id="appointmentList" class="space-y-4">
+                        <!-- Appointments will be rendered here -->
                         <div id="loadingState" class="text-center py-10"><p class="text-gray-500">Loading appointments...</p></div>
-                        <div id="emptyState" class="hidden text-center py-10 px-4">
-                            <!-- Empty state SVG and text -->
+                         <div id="emptyState" class="hidden text-center py-10 px-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <h3 class="mt-2 text-lg font-medium text-gray-900">No appointments scheduled</h3>
+                            <p class="mt-1 text-sm text-gray-500">Use the form on the left to add a new reminder.</p>
                         </div>
                     </div>
                 </div>
@@ -95,45 +100,44 @@
     </div>
 
     <!-- Edit Appointment Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden modal">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg m-4 modal-content">
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg m-4">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Appointment</h2>
             <form id="editAppointmentForm">
                 <input type="hidden" id="edit_appointment_id" name="appointment_id">
                 <div class="space-y-4">
-                    <!-- Edit form fields -->
-                    <div>
-                        <label for="edit_patient_name" class="form-label">Patient Name</label>
-                        <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
+                     <div>
+                        <label for="edit_patient_name" class="text-sm font-medium text-gray-600">Patient Name</label>
+                        <input type="text" id="edit_patient_name" name="patient_name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                     </div>
                     <div>
-                        <label for="edit_doctor_name" class="form-label">Doctor's Name</label>
-                        <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
+                        <label for="edit_doctor_name" class="text-sm font-medium text-gray-600">Doctor's Name</label>
+                        <input type="text" id="edit_doctor_name" name="doctor_name" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                     </div>
                     <div>
-                        <label for="edit_appointment_date" class="form-label">Appointment Date</label>
-                        <input type="date" id="edit_appointment_date" name="appointment_date" required class="form-input">
+                        <label for="edit_appointment_date" class="text-sm font-medium text-gray-600">Appointment Date</label>
+                        <input type="date" id="edit_appointment_date" name="appointment_date" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                     </div>
                     <div>
-                        <label for="edit_appointment_time" class="form-label">Appointment Time</label>
-                        <input type="time" id="edit_appointment_time" name="appointment_time" required class="form-input">
+                        <label for="edit_appointment_time" class="text-sm font-medium text-gray-600">Appointment Time</label>
+                        <input type="time" id="edit_appointment_time" name="appointment_time" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                     </div>
                     <div>
-                        <label for="edit_status" class="form-label">Status</label>
-                        <select id="edit_status" name="status" required class="form-input">
+                        <label for="edit_status" class="text-sm font-medium text-gray-600">Status</label>
+                        <select id="edit_status" name="status" required class="mt-1 w-full p-2 border border-gray-300 rounded-lg">
                             <option value="Scheduled">Scheduled</option>
                             <option value="Completed">Completed</option>
                             <option value="Canceled">Canceled</option>
                         </select>
                     </div>
                     <div>
-                        <label for="edit_notes" class="form-label">Notes / Reason for Visit</label>
-                        <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>
+                        <label for="edit_notes" class="text-sm font-medium text-gray-600">Notes / Reason for Visit</label>
+                        <textarea id="edit_notes" name="notes" rows="3" class="mt-1 w-full p-2 border border-gray-300 rounded-lg"></textarea>
                     </div>
                 </div>
                 <div class="mt-8 flex justify-end space-x-4">
-                    <button type="button" id="cancelEdit" class="button-secondary">Cancel</button>
-                    <button type="submit" class="button-primary">Save Changes</button>
+                    <button type="button" id="cancelEdit" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
                 </div>
             </form>
         </div>
