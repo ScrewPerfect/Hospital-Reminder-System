@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <a href="php/logout.php" class="ml-4 text-sm text-blue-600 hover:underline">Logout</a>
                 `;
                 fetchAppointments();
-                renderCalendar();
             } else {
                 window.location.href = 'login.html';
             }
@@ -49,11 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 appointments = data.appointments;
                 renderAppointments();
-                renderCalendar();
+                renderCalendar(); // Initial calendar render with appointments
             } else {
                 alert('Could not fetch appointments.');
             }
-        } catch (error) {
+        } catch (error)
+        {
             console.error('Error fetching appointments:', error);
             alert('An error occurred. Please try again.');
         } finally {
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('php/add_appointment.php', {
                 method: 'POST',
-                body: formData 
+                body: formData
             });
             const result = await response.json();
             if (result.success) {
@@ -272,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check for appointments
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             if (appointments.some(app => app.date === dateStr)) {
+                console.log(`Appointment found for date: ${dateStr}`);
                 dayEl.classList.add('has-appointment');
             }
             calendarDaysEl.appendChild(dayEl);
