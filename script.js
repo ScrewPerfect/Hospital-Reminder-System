@@ -1,24 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // This function is called on every page load.
-    // We will determine which page we are on and run the appropriate functions.
-    
-    // Check for elements that are unique to the dashboard page
-    if (document.getElementById('appointmentList')) {
-        initializeDashboard();
-    }
-
-    // Check for elements that are unique to the profile page
-    if (document.getElementById('updateEmailForm')) {
-        initializeProfilePage();
-    }
-
-    // Check for elements unique to the auth pages
-    if (document.getElementById('loginForm') || document.getElementById('registerForm')) {
-        initializeAuthPage();
-    }
+    // This script is for the main dashboard page (index.html)
+    // It will only run the dashboard logic.
+    initializeDashboard();
 });
 
-
+/**
+ * Contains all logic for the main dashboard (index.html)
+ */
 function initializeDashboard() {
     checkLoginStatus();
 
@@ -65,9 +53,9 @@ function initializeDashboard() {
     }
 
     async function fetchAppointments() {
-        loadingState.style.display = 'block';
-        emptyState.style.display = 'none';
-        appointmentList.innerHTML = '';
+        if(loadingState) loadingState.style.display = 'block';
+        if(emptyState) emptyState.style.display = 'none';
+        if(appointmentList) appointmentList.innerHTML = '';
 
         try {
             const response = await fetch(`./php/get_appointments.php?t=${new Date().getTime()}`);
@@ -84,22 +72,25 @@ function initializeDashboard() {
             console.error('Error fetching appointments:', error);
             alert('An error occurred while fetching appointments.');
         } finally {
-            loadingState.style.display = 'none';
+            if(loadingState) loadingState.style.display = 'none';
         }
     }
 
     function renderAppointments() {
+        if (!appointmentList) return;
         appointmentList.innerHTML = '';
         if (appointments.length === 0) {
-            emptyState.style.display = 'block';
+            if(emptyState) emptyState.style.display = 'block';
         } else {
-            emptyState.style.display = 'none';
+            if(emptyState) emptyState.style.display = 'none';
             appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
             appointments.forEach(app => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
     
     function createAppointmentCard(app) {
@@ -108,9 +99,9 @@ function initializeDashboard() {
         card.dataset.id = app.id;
 
         const statusColors = {
-            'Scheduled': 'bg-blue-100 text-blue-800',
-            'Completed': 'bg-green-100 text-green-800',
-            'Canceled': 'bg-red-100 text-red-800'
+            'Scheduled': 'status-scheduled',
+            'Completed': 'status-completed',
+            'Canceled': 'status-canceled'
         };
 
         const countdown = calculateCountdown(app.date, app.time);
@@ -270,7 +261,7 @@ function initializeDashboard() {
 
     function openEditModal(appointmentId) {
         const appointment = appointments.find(app => app.id == appointmentId);
-        if (appointment) {
+        if (appointment && editModal) {
             document.getElementById('edit_appointment_id').value = appointment.id;
             document.getElementById('edit_patient_name').value = appointment.patient_name;
             document.getElementById('edit_doctor_name').value = appointment.doctor_name;
@@ -316,7 +307,7 @@ function initializeDashboard() {
     async function deleteAppointment(appointmentId) {
         try {
              const formData = new FormData();
-             formData.append('appointment_id', appointmentId);
+             formData.append('id', appointmentId);
 
             const response = await fetch('php/delete_appointment.php', {
                 method: 'POST',
@@ -335,17 +326,5 @@ function initializeDashboard() {
             alert('An error occurred while deleting. Please try again.');
         }
     }
-}
-
-function initializeProfilePage() {
-    // All profile-specific JavaScript code goes here.
-    // This function can be defined in profile.js if you create it.
-    console.log("Profile page initialized");
-}
-
-function initializeAuthPage() {
-    // All authentication (login/register) JavaScript code goes here.
-    // This function can be defined in auth.js if you create it.
-    console.log("Auth page initialized");
 }
 

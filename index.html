@@ -7,75 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .form-input {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #D1D5DB;
-            border-radius: 0.5rem;
-            transition: box-shadow 0.2s, border-color 0.2s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
-        }
-        .button-primary {
-            background-color: #2563EB;
-            color: white;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .button-primary:hover {
-            background-color: #1D4ED8;
-        }
-        .button-secondary {
-            background-color: #E5E7EB;
-            color: #374151;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .button-secondary:hover {
-            background-color: #D1D5DB;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.5rem;
-        }
-        .calendar-day {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 2.5rem;
-            width: 2.5rem;
-            border-radius: 9999px;
-            cursor: default;
-        }
-        .calendar-day.today {
-            background-color: #2563EB;
-            color: white;
-        }
-        .calendar-day.has-appointment {
-            background-color: #DBEAFE;
-            color: #1E40AF;
-            font-weight: bold;
-        }
-        .status-tag {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-50">
 
@@ -99,23 +31,23 @@
                     </h2>
                     <form id="appointmentForm" class="space-y-4">
                         <div>
-                            <label for="patient_name" class="text-sm font-medium text-gray-600">Patient Name</label>
+                            <label for="patient_name" class="form-label">Patient Name</label>
                             <input type="text" id="patient_name" name="patient_name" required class="form-input">
                         </div>
                         <div>
-                            <label for="doctor_name" class="text-sm font-medium text-gray-600">Doctor's Name</label>
+                            <label for="doctor_name" class="form-label">Doctor's Name</label>
                             <input type="text" id="doctor_name" name="doctor_name" required class="form-input">
                         </div>
                         <div>
-                            <label for="appointment_date" class="text-sm font-medium text-gray-600">Appointment Date</label>
+                            <label for="appointment_date" class="form-label">Appointment Date</label>
                             <input type="date" id="appointment_date" name="appointment_date" required class="form-input">
                         </div>
                          <div>
-                            <label for="appointment_time" class="text-sm font-medium text-gray-600">Appointment Time</label>
+                            <label for="appointment_time" class="form-label">Appointment Time</label>
                             <input type="time" id="appointment_time" name="appointment_time" required class="form-input">
                         </div>
                         <div>
-                            <label for="status" class="text-sm font-medium text-gray-600">Status</label>
+                            <label for="status" class="form-label">Status</label>
                             <select id="status" name="status" required class="form-input">
                                 <option value="Scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
@@ -123,7 +55,7 @@
                             </select>
                         </div>
                         <div>
-                            <label for="notes" class="text-sm font-medium text-gray-600">Notes / Reason for Visit</label>
+                            <label for="notes" class="form-label">Notes / Reason for Visit</label>
                             <textarea id="notes" name="notes" rows="3" class="form-input" placeholder="e.g., Annual Checkup"></textarea>
                         </div>
                         <button type="submit" class="button-primary w-full">
@@ -143,7 +75,7 @@
                         <div class="calendar-grid text-center text-sm font-medium text-gray-500">
                             <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
                         </div>
-                        <div id="calendarDays" class="calendar-grid text-center items-center justify-center">
+                        <div id="calendarDays" class="calendar-grid text-center">
                             <!-- Calendar days will be generated here -->
                         </div>
                     </div>
@@ -173,30 +105,30 @@
     </div>
 
     <!-- Edit Appointment Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg m-4">
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden modal">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg m-4 modal-content">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Appointment</h2>
             <form id="editAppointmentForm">
                 <input type="hidden" id="edit_appointment_id" name="appointment_id">
                 <div class="space-y-4">
                      <div>
-                        <label for="edit_patient_name" class="text-sm font-medium text-gray-600">Patient Name</label>
+                        <label for="edit_patient_name" class="form-label">Patient Name</label>
                         <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
                     </div>
                     <div>
-                        <label for="edit_doctor_name" class="text-sm font-medium text-gray-600">Doctor's Name</label>
+                        <label for="edit_doctor_name" class="form-label">Doctor's Name</label>
                         <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
                     </div>
                     <div>
-                        <label for="edit_appointment_date" class="text-sm font-medium text-gray-600">Appointment Date</label>
+                        <label for="edit_appointment_date" class="form-label">Appointment Date</label>
                         <input type="date" id="edit_appointment_date" name="appointment_date" required class="form-input">
                     </div>
                     <div>
-                        <label for="edit_appointment_time" class="text-sm font-medium text-gray-600">Appointment Time</label>
+                        <label for="edit_appointment_time" class="form-label">Appointment Time</label>
                         <input type="time" id="edit_appointment_time" name="appointment_time" required class="form-input">
                     </div>
                     <div>
-                        <label for="edit_status" class="text-sm font-medium text-gray-600">Status</label>
+                        <label for="edit_status" class="form-label">Status</label>
                         <select id="edit_status" name="status" required class="form-input">
                             <option value="Scheduled">Scheduled</option>
                             <option value="Completed">Completed</option>
@@ -204,7 +136,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="edit_notes" class="text-sm font-medium text-gray-600">Notes / Reason for Visit</label>
+                        <label for="edit_notes" class="form-label">Notes / Reason for Visit</label>
                         <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>
                     </div>
                 </div>
