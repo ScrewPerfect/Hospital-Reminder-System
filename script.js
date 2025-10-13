@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // This wrapper ensures the script runs only after the page is fully loaded, preventing errors.
+    // Defensive Check: This script is for the main dashboard page (index.html).
+    // If it can't find the main appointment form, it will stop running to prevent errors on other pages.
+    if (!document.getElementById('appointmentForm')) {
+        return; 
+    }
 
     // --- DOM Element Selection ---
     const appointmentForm = document.getElementById('appointmentForm');
@@ -25,10 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core Functions ---
 
-    /**
-     * Checks if the user is logged in. If not, redirects to the login page.
-     * If logged in, it displays a welcome message and fetches the appointments.
-     */
     async function checkLoginStatus() {
         try {
             const response = await fetch('php/check_session.php');
@@ -53,16 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Fetches all appointments for the logged-in user from the server.
-     */
     async function fetchAppointments() {
         if(loadingState) loadingState.style.display = 'block';
         if(emptyState) emptyState.style.display = 'none';
         if(appointmentList) appointmentList.innerHTML = '';
 
         try {
-            // Added a cache-busting parameter to ensure fresh data
             const response = await fetch(`./php/get_appointments.php?t=${new Date().getTime()}`);
             const data = await response.json();
             
@@ -81,9 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Renders the list of appointment cards on the dashboard.
-     */
     function renderAppointments() {
         if (!appointmentList) return;
         appointmentList.innerHTML = '';
@@ -91,23 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if(emptyState) emptyState.style.display = 'block';
         } else {
             if(emptyState) emptyState.style.display = 'none';
-            // Sort appointments chronologically
             appointments.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
             appointments.forEach(app => {
                 appointmentList.appendChild(createAppointmentCard(app));
             });
         }
-        // Re-initialize any dynamic icons after rendering
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
     }
     
-    /**
-     * Creates and returns a single HTML element for an appointment card.
-     * @param {object} app - The appointment object.
-     * @returns {HTMLElement} The appointment card div.
-     */
     function createAppointmentCard(app) {
         const card = document.createElement('div');
         card.className = 'appointment-card';
@@ -165,12 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-    /**
-     * Calculates the time remaining until an appointment.
-     * @param {string} date - The appointment date (YYYY-MM-DD).
-     * @param {string} time - The appointment time (HH:mm).
-     * @returns {string} A formatted string representing the time left.
-     */
      function calculateCountdown(date, time) {
         const appointmentTime = new Date(`${date}T${time}`);
         const now = new Date();
@@ -187,9 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${minutes}m`;
     }
 
-    /**
-     * Renders the interactive calendar for the current month.
-     */
     function renderCalendar() {
         if (!calendarDaysEl) return;
         calendarDaysEl.innerHTML = '';
@@ -201,14 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // Add empty divs for days before the 1st of the month
         for (let i = 0; i < firstDay; i++) {
             calendarDaysEl.innerHTML += '<div></div>';
         }
 
         const appointmentDates = appointments.map(app => app.date);
 
-        // Add the days of the month
         for (let day = 1; day <= daysInMonth; day++) {
             const dayEl = document.createElement('div');
             dayEl.textContent = day;
@@ -227,8 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
             calendarDaysEl.appendChild(dayEl);
         }
     }
-
-    // --- Event Listeners ---
 
     if (prevMonthBtn) {
         prevMonthBtn.addEventListener('click', () => {
@@ -283,10 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Opens and populates the edit modal with the selected appointment's data.
-     * @param {string} appointmentId - The ID of the appointment to edit.
-     */
     function openEditModal(appointmentId) {
         const appointment = appointments.find(app => app.id == appointmentId);
         if (appointment && editModal) {
@@ -328,10 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Sends a request to the server to delete an appointment.
-     * @param {string} appointmentId - The ID of the appointment to delete.
-     */
     async function deleteAppointment(appointmentId) {
         try {
              const formData = new FormData();
