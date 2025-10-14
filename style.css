@@ -1,162 +1,200 @@
-/* --- Global Styles & Layout --- */
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* --- GENERAL STYLES --- */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f9fafb;
-    color: #1f2937;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa; /* Lighter gray */
+    color: #343a40; /* Darker text for better contrast */
+    line-height: 1.6;
     margin: 0;
-    padding: 2rem;
 }
 
 .container {
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 2rem;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
+/* --- HEADER & TYPOGRAPHY --- */
 header h1 {
     font-size: 2.5rem;
     font-weight: 800;
-    color: #334155;
+    color: #2c5282; /* Deeper blue */
 }
 
-/* --- Card Styles --- */
+h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #34495e; /* Slate gray */
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- CARDS & LAYOUT --- */
 .card {
-    background-color: white;
+    background-color: #ffffff;
+    border-radius: 1rem; /* More rounded */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
     padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
-/* --- Form & Button Styles --- */
-.form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #4b5563;
-    margin-bottom: 0.5rem;
+.card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-4px);
 }
 
-.form-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    box-sizing: border-box;
-}
-
-.button-primary {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: none;
-    background-color: #2563eb;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.button-primary:hover {
-    background-color: #1d4ed8;
-}
-
-.button-secondary {
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: none;
-    background-color: #e5e7eb;
-    color: #1f2937;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.button-secondary:hover {
-    background-color: #d1d5db;
-}
-
-
-/* --- Dashboard Specific Styles --- */
 .main-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 2rem;
 }
+
 @media (min-width: 1024px) {
     .main-grid {
         grid-template-columns: 1fr 2fr;
     }
 }
 
+/* --- FORMS & BUTTONS --- */
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.button-primary {
+    display: inline-block;
+    width: 100%;
+    background: linear-gradient(90deg, #4F46E5, #818CF8);
+    color: white;
+    font-weight: 600;
+    padding: 0.8rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(0,0,0,0.1);
+}
+
+.button-secondary {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+.button-secondary:hover {
+    background-color: #cbd5e0;
+}
+
+/* --- APPOINTMENT CARD --- */
 .appointment-card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
 }
+
+.patient-name { font-weight: 700; font-size: 1.25rem; color: #1e293b; }
+.doctor-name { color: #475569; margin-bottom: 1rem; }
+.appointment-details p { margin: 0.25rem 0; color: #334155; }
 
 .status-tag {
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 .status-scheduled { background-color: #dbeafe; color: #1e40af; }
 .status-completed { background-color: #d1fae5; color: #065f46; }
 .status-canceled { background-color: #fee2e2; color: #991b1b; }
 
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+}
+.icon-button:hover { background-color: #e2e8f0; color: #1e293b; }
 
-/* --- Calendar Styles --- */
+/* --- CALENDAR STYLES --- */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
-    text-align: center;
 }
 .calendar-day {
     padding: 0.5rem;
-    border-radius: 9999px;
+    text-align: center;
+    border-radius: 50%;
+    cursor: default;
+    transition: all 0.2s ease;
 }
-.calendar-day.today {
-    background-color: #2563eb;
-    color: white;
+.calendar-day.today { background-color: #3b82f6; color: white; }
+.calendar-day.has-appointment { background-color: #bfdbfe; color: #1d4ed8; font-weight: 600; }
+
+/* --- WIDGETS (Health Tip / Quote) --- */
+.widget {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 }
-.calendar-day.has-appointment {
-    font-weight: bold;
-    background-color: #bfdbfe;
-    color: #1e40af;
+.widget-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #334155;
+    margin-bottom: 0.75rem;
+}
+.widget-content {
+    color: #475569;
 }
 
-
-/* --- Modal Styles --- */
+/* --- MODAL --- */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(17, 24, 39, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .modal-content {
-    background-color: white;
+    background: white;
     padding: 2rem;
     border-radius: 1rem;
     width: 100%;
     max-width: 500px;
 }
-
-/* --- Authentication Pages --- */
-.auth-card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    width: 100%;
-    max-width: 400px;
-}
+.hidden { display: none; }
 
