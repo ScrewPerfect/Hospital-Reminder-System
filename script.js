@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // This is a check to ensure this script only runs on the main dashboard page.
+    // --- EARLY EXIT ---
+    // This is a crucial check to ensure this script only runs on the main dashboard page.
     if (!document.getElementById('appointmentForm')) {
         return; 
     }
@@ -22,16 +23,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentDate = new Date();
     let appointments = [];
-    let translations = {};
+    let translations = {}; 
 
     // --- TRANSLATION FUNCTIONS ---
     async function loadLanguage(lang) {
         try {
-            const response = await fetch(`locales/${lang}.json`);
+            // FIX: Using the absolute path that includes /php/
+            const path = `/Hospital-Reminder-System/php/locales/${lang.toLowerCase()}.json?v=${Date.now()}`;
+            
+            const response = await fetch(path);
+            
+            // Check if response status is OK (200-299)
+            if (!response.ok) {
+                 // Throw a custom error if the file is not found (404)
+                throw new Error(`Failed to load ${lang}.json from path: ${path}. Status: ${response.status}`);
+            }
             translations = await response.json();
             translatePage();
         } catch (error) {
             console.error(`Could not load language file for: ${lang}`, error);
+            // Fallback to English if translation fails on the first attempt
+            if (lang !== 'en') {
+                loadLanguage('en');
+            }
         }
     }
 
@@ -42,34 +56,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 element.textContent = translations[key];
             }
         });
+        // Re-render user info and widgets after translation
+        checkLoginStatus(true); 
+        displayHealthTip();
+        fetchQuote();
     }
 
-    languageSwitcher.addEventListener('change', (e) => {
-        loadLanguage(e.target.value);
-    });
+    if (languageSwitcher) {
+        languageSwitcher.addEventListener('change', (e) => {
+            loadLanguage(e.target.value);
+        });
+    }
 
     // --- CORE FUNCTIONS ---
 
-    const checkLoginStatus = async () => {
+    const checkLoginStatus = async (isTranslation = false) => {
         try {
             const res = await fetch('php/check_session.php');
             const session = await res.json();
             if (session.loggedIn) {
                 const userInfoDiv = document.getElementById('user-info');
                 if (userInfoDiv) {
+                    // Update user info and links based on current language
+                    const profileText = translations.profileLink || 'Profile';
+                    const logoutText = translations.logoutLink || 'Logout';
+
                     userInfoDiv.innerHTML = `
                         <p>
                             Welcome, <span class="font-semibold">${session.username}</span> | 
-                            <a href="profile.html" class="link">Profile</a> | 
-                            <a href="php/logout.php" class="link">Logout</a>
+                            <a href="profile.html" class="link">${profileText}</a> | 
+                            <a href="php/logout.php" class="link">${logoutText}</a>
                         </p>
                     `;
                 }
-                // Load initial language and then fetch data
-                await loadLanguage(languageSwitcher.value);
-                fetchAppointments();
-                displayHealthTip();
-                fetchQuote();
+                // Only load the language and fetch data on the FIRST run (not during translation update)
+                if (!isTranslation) {
+                    // Load saved language or default to 'en'
+                    await loadLanguage(languageSwitcher ? languageSwitcher.value : 'en'); 
+                    fetchAppointments();
+                    displayHealthTip();
+                    fetchQuote();
+                }
             } else {
                 window.location.href = 'login.html';
             }
@@ -79,28 +106,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const fetchAppointments = async () => {
+        if (!loadingState || !emptyState || !appointmentList) return;
         loadingState.style.display = 'block';
         emptyState.style.display = 'none';
         appointmentList.innerHTML = '';
+
         try {
             const res = await fetch(`./php/get_appointments.php?t=${Date.now()}`);
             const data = await res.json();
+
             if (data.success) {
                 appointments = data.appointments;
                 renderAppointments();
                 renderCalendar();
             } else {
-                alert('Could not fetch appointments.');
+                alert(translations.loadingError || 'Could not fetch appointments.');
             }
         } catch (err) {
             console.error(err);
-            alert('Error fetching appointments.');
+            alert(translations.loadingError || 'Error fetching appointments.');
         } finally {
             loadingState.style.display = 'none';
         }
     };
 
-    // --- RENDER FUNCTIONS (No changes needed here) ---
+    // --- RENDER FUNCTIONS ---
 
     const renderAppointments = () => {
         appointmentList.innerHTML = '';
@@ -111,28 +141,34 @@ document.addEventListener('DOMContentLoaded', () => {
             appointments.sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
             appointments.forEach(app => appointmentList.appendChild(createAppointmentCard(app)));
         }
-        lucide.createIcons(); // Re-initialize icons
+        lucide.createIcons();
     };
 
     const createAppointmentCard = (app) => {
         const card = document.createElement('div');
         card.className = 'appointment-card';
         card.dataset.id = app.id;
+        
+        // Use translated text for buttons/status if available
+        const statusText = translations[app.status.toLowerCase()] || app.status;
+        const editText = translations.edit || 'Edit';
+        const deleteText = translations.delete || 'Delete';
+
         card.innerHTML = `
             <div class="appointment-card-body">
                 <p class="patient-name">${app.patient_name}</p>
-                <p class="doctor-name">with Dr. ${app.doctor_name}</p>
+                <p class="doctor-name">${translations.withDr || 'with Dr.'} ${app.doctor_name}</p>
                 <div class="appointment-details">
                     <p><i data-lucide="calendar"></i>${app.date}</p>
                     <p><i data-lucide="clock"></i>${app.time}</p>
-                    <p><i data-lucide="info"></i>Notes: ${app.notes || 'N/A'}</p>
+                    <p><i data-lucide="info"></i>${translations.notesLabel || 'Notes:'} ${app.notes || 'N/A'}</p>
                 </div>
             </div>
             <div class="appointment-card-aside">
-                <span class="status-tag status-${(app.status || 'scheduled').toLowerCase()}">${app.status || 'Scheduled'}</span>
+                <span class="status-tag status-${(app.status || 'scheduled').toLowerCase()}">${statusText}</span>
                 <div class="appointment-actions">
-                    <button class="icon-button edit-btn" data-id="${app.id}"><i data-lucide="edit-2"></i></button>
-                    <button class="icon-button delete-btn" data-id="${app.id}"><i data-lucide="trash-2"></i></button>
+                    <button class="icon-button edit-btn" data-id="${app.id}"><i data-lucide="edit-2"></i> ${editText}</button>
+                    <button class="icon-button delete-btn" data-id="${app.id}"><i data-lucide="trash-2"></i> ${deleteText}</button>
                 </div>
             </div>
         `;
@@ -163,22 +199,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // --- WIDGET FUNCTIONS (No changes needed here) ---
+    // --- WIDGET FUNCTIONS ---
 
     const displayHealthTip = () => {
         const tips = [
-            "Drink at least 8 glasses of water a day to stay hydrated.",
-            "Aim for 30 minutes of moderate exercise most days of the week.",
-            "Eat a balanced diet with plenty of fruits and vegetables.",
-            "Get 7-9 hours of quality sleep per night.",
-            "Practice mindfulness or meditation to reduce stress levels."
+            translations.tip1 || "Drink at least 8 glasses of water a day to stay hydrated.",
+            translations.tip2 || "Aim for 30 minutes of moderate exercise most days of the week.",
+            translations.tip3 || "Eat a balanced diet with plenty of fruits and vegetables.",
+            translations.tip4 || "Get 7-9 hours of quality sleep per night.",
+            translations.tip5 || "Practice mindfulness or meditation to reduce stress levels."
         ];
         const randomTip = tips[Math.floor(Math.random() * tips.length)];
         if (healthTipWidget) {
             healthTipWidget.innerHTML = `
                 <i data-lucide="heart-pulse"></i>
                 <div>
-                    <h3 class="widget-title" data-i18n-key="healthTipTitle">Health Tip of the Day</h3>
+                    <h3 class="widget-title" data-i18n-key="healthTipTitle">${translations.healthTipTitle || 'Health Tip of the Day'}</h3>
                     <p class="widget-text">${randomTip}</p>
                 </div>
             `;
@@ -195,22 +231,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     quoteWidget.innerHTML = `
                         <i data-lucide="quote"></i>
                         <div>
-                            <h3 class="widget-title" data-i18n-key="quoteTitle">Quote of the Day</h3>
+                            <h3 class="widget-title" data-i18n-key="quoteTitle">${translations.quoteTitle || 'Quote of the Day'}</h3>
                             <p class="widget-text">"${data.quote.q}" - <em>${data.quote.a}</em></p>
                         </div>
                     `;
                 } else {
-                     quoteWidget.innerHTML = `<p data-i18n-key="couldNotLoadQuote">Could not load quote.</p>`;
+                     quoteWidget.innerHTML = `<p class="widget-text" data-i18n-key="couldNotLoadQuote">${translations.couldNotLoadQuote || 'Could not load quote.'}</p>`;
                 }
             } catch {
-                quoteWidget.innerHTML = `<p data-i18n-key="couldNotLoadQuote">Could not load quote.</p>`;
+                quoteWidget.innerHTML = `<p class="widget-text" data-i18n-key="couldNotLoadQuote">${translations.couldNotLoadQuote || 'Could not load quote.'}</p>`;
             }
             lucide.createIcons();
         }
     };
 
 
-    // --- EVENT LISTENERS (No changes needed here) ---
+    // --- EVENT LISTENERS ---
 
     appointmentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -222,10 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetchAppointments();
                 appointmentForm.reset();
             } else {
-                alert(result.message || 'Error adding appointment.');
+                alert(result.message || (translations.addError || 'Error adding appointment.'));
             }
         } catch {
-            alert('Error adding appointment.');
+            alert(translations.addError || 'Error adding appointment.');
         }
     });
 
@@ -233,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editBtn = e.target.closest('.edit-btn');
         const delBtn = e.target.closest('.delete-btn');
         if (editBtn) openEditModal(editBtn.dataset.id);
-        if (delBtn && confirm('Are you sure you want to delete this appointment?')) {
+        if (delBtn && confirm(translations.confirmDelete || 'Are you sure you want to delete this appointment?')) {
             deleteAppointment(delBtn.dataset.id);
         }
     });
@@ -270,11 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     closeEditModal();
                     fetchAppointments();
                 } else {
-                    alert(result.message || 'Error updating appointment.');
+                    alert(result.message || (translations.updateError || 'Error updating appointment.'));
                 }
             } catch (err) {
                 console.error('Update appointment error:', err);
-                alert('An error occurred while updating.');
+                alert(translations.updateError || 'An error occurred while updating.');
             }
         });
     }
@@ -286,9 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('php/delete_appointment.php', { method: 'POST', body: fd });
             const result = await res.json();
             if (result.success) fetchAppointments();
-            else alert(result.message || 'Error deleting appointment.');
+            else alert(result.message || (translations.deleteError || 'Error deleting appointment.'));
         } catch {
-            alert('Error deleting appointment.');
+            alert(translations.deleteError || 'Error deleting appointment.');
         }
     };
 
@@ -309,4 +345,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INITIAL LOAD ---
     checkLoginStatus();
 });
-
