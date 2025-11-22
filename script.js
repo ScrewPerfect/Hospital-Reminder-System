@@ -28,8 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- TRANSLATION FUNCTIONS ---
     async function loadLanguage(lang) {
         try {
-            // FIX: Using the absolute path that includes /php/
-            const path = `/Hospital-Reminder-System/php/locales/${lang.toLowerCase()}.json?v=${Date.now()}`;
+            // THE FINAL FIX: Using the relative path that starts from the index.html location.
+            // Since index.html and php folder are siblings, this is the most reliable path structure.
+            const path = `php/locales/${lang.toLowerCase()}.json?v=${Date.now()}`;
             
             const response = await fetch(path);
             
