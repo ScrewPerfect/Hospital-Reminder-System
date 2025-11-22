@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Hospital Appointment Reminder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
@@ -13,48 +13,72 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f9fafb;
             color: #1f2937;
+            margin: 0;
         }
 
         .container {
             max-width: 80rem;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 1.5rem; /* Smaller padding for mobile */
         }
         
+        /* --- RESPONSIVE LAYOUT GRID --- */
         main {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column; /* Stack columns on mobile */
             gap: 2rem;
         }
         @media (min-width: 1024px) {
             main {
-                grid-template-columns: 1fr 2fr;
+                display: grid;
+                grid-template-columns: 1fr 2fr; /* Side-by-side on desktop */
             }
         }
         
-        /* --- Header --- */
+        /* --- RESPONSIVE HEADER (THE FIX) --- */
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         .header-top {
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stack title and button vertically on mobile */
             align-items: center;
+            gap: 1rem; 
             position: relative;
             margin-bottom: 0.75rem;
         }
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
+            font-size: 2rem; /* Smaller font for mobile */
+            font-weight: 700;
             color: #111827;
+            margin: 0;
+            line-height: 1.2;
         }
         .language-switcher-wrapper {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            position: static; /* No absolute positioning on mobile */
+            width: 100%;
+            max-width: 200px;
         }
+        
+        /* Desktop Header Styles */
+        @media (min-width: 768px) {
+            .header-top {
+                flex-direction: row;
+                justify-content: center;
+            }
+            header h1 {
+                font-size: 2.8rem;
+            }
+            .language-switcher-wrapper {
+                position: absolute; /* Stick to right only on desktop */
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: auto;
+            }
+        }
+
         header .link {
             color: #2563eb;
             text-decoration: none;
@@ -64,12 +88,13 @@
             text-decoration: underline;
         }
 
-        /* --- Form Elements --- */
+        /* --- Card Styling --- */
         .card {
             background-color: white;
             padding: 1.5rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
         .card-title {
@@ -84,11 +109,14 @@
         .card-title .lucide {
             margin-right: 0.5rem;
             color: #2563eb;
+            width: 24px;
+            height: 24px;
         }
 
+        /* --- Form Elements --- */
         .form-label {
             display: block;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: #4b5563;
             margin-bottom: 0.25rem;
@@ -100,13 +128,16 @@
             border: 1px solid #d1d5db;
             border-radius: 0.5rem;
             transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box; /* Fixes padding issues */
+            font-family: 'Poppins', sans-serif;
         }
         .form-input:focus {
             outline: none;
             border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
+        /* --- Buttons --- */
         .button-primary {
             width: 100%;
             background-color: #2563eb;
@@ -117,6 +148,7 @@
             border-radius: 0.5rem;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-family: 'Poppins', sans-serif;
         }
         .button-primary:hover {
             background-color: #1d4ed8;
@@ -131,6 +163,7 @@
             border-radius: 0.5rem;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-family: 'Poppins', sans-serif;
         }
         .button-secondary:hover {
             background-color: #d1d5db;
@@ -145,26 +178,37 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 1rem;
         }
         .calendar-header h3 {
             font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
         }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 0.5rem;
+            gap: 0.25rem; /* Smaller gap for mobile */
             text-align: center;
         }
         .calendar-day-header {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6b7280;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
         }
         .calendar-day {
             padding: 0.5rem;
             border-radius: 9999px;
             cursor: default;
+            font-weight: 500;
+            width: 2rem; /* Fixed width for circles */
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
         }
         .calendar-day.today {
             background-color: #2563eb;
@@ -180,18 +224,23 @@
         .widget {
             display: flex;
             align-items: flex-start;
+            background: linear-gradient(to bottom right, #ffffff, #f3f4f6);
+            margin-bottom: 1.5rem;
         }
         .widget .lucide {
             flex-shrink: 0;
             margin-right: 1rem;
+            width: 24px;
+            height: 24px;
         }
         .widget-title {
-            font-weight: 600;
+            font-weight: 700;
             color: #111827;
             margin-bottom: 0.25rem;
         }
         .widget-text {
             color: #4b5563;
+            line-height: 1.5;
         }
         #healthTipWidget .lucide { color: #16a34a; }
         #quoteWidget .lucide { color: #7c3aed; }
@@ -199,78 +248,119 @@
         /* --- Appointment Card --- */
         .appointment-card {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column; /* Stack on mobile */
             padding: 1.5rem;
             border: 1px solid #e5e7eb;
             border-radius: 1rem;
             transition: box-shadow 0.2s, transform 0.2s;
+            margin-bottom: 1rem;
+            background: white;
+        }
+        @media (min-width: 640px) {
+            .appointment-card {
+                flex-direction: row;
+                justify-content: space-between;
+            }
         }
         .appointment-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .appointment-card-body, .appointment-card-aside {
-            display: flex;
-            flex-direction: column;
-        }
+
         .appointment-card-body {
             flex-grow: 1;
+            margin-bottom: 1rem;
         }
+        @media (min-width: 640px) {
+            .appointment-card-body {
+                margin-bottom: 0;
+            }
+        }
+
         .appointment-card-aside {
-            align-items: flex-end;
-            margin-left: 1rem;
+            display: flex;
+            flex-direction: row; /* Row on mobile */
+            align-items: center;
+            justify-content: space-between;
+            margin-left: 0;
         }
+        @media (min-width: 640px) {
+            .appointment-card-aside {
+                flex-direction: column;
+                align-items: flex-end;
+                margin-left: 1rem;
+            }
+        }
+
         .appointment-details p {
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
             color: #4b5563;
+            font-size: 0.9rem;
         }
         .appointment-details .lucide {
-            margin-right: 0.75rem;
+            margin-right: 0.5rem;
+            width: 16px;
+            height: 16px;
+            color: #2563eb;
         }
         .patient-name {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #111827;
             margin-bottom: 0.25rem;
         }
         .doctor-name {
-            color: #4b5563;
+            color: #6b7280;
             margin-bottom: 1rem;
+            font-size: 0.95rem;
         }
-        
+        .countdown-timer {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
         /* Status Tag Styles */
         .status-tag {
             padding: 0.25rem 0.75rem;
             border-radius: 9999px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .status-scheduled { background-color: #dbeafe; color: #1e40af; }
         .status-completed { background-color: #d1fae5; color: #065f46; }
         .status-canceled { background-color: #fee2e2; color: #991b1b; }
 
         .appointment-actions {
-            margin-top: 1rem;
             display: flex;
             gap: 0.5rem;
         }
         .icon-button {
             padding: 0.5rem;
-            border-radius: 9999px;
-            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
             background-color: white;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .icon-button .lucide {
+            width: 18px;
+            height: 18px;
+            color: #6b7280;
+        }
         .icon-button:hover {
             background-color: #f3f4f6;
-            color: #1d4ed8;
+            border-color: #d1d5db;
+        }
+        .icon-button:hover .lucide {
+            color: #111827;
         }
 
         /* --- Modal --- */
@@ -281,28 +371,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
+            padding: 1rem; /* Prevent touching edges on mobile */
         }
         .modal-content {
             background-color: white;
             padding: 2rem;
             border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             width: 100%;
             max-width: 32rem;
-            margin: 1rem;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .hidden {
             display: none;
         }
-        .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-            --tw-space-y-reverse: 0;
-            margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
-            margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+        
+        /* Helper to hide on mobile if needed */
+        .hide-on-mobile {
+            display: none;
         }
-        .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-            --tw-space-y-reverse: 0;
-            margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
-            margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+        @media (min-width: 768px) {
+            .hide-on-mobile {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -327,7 +420,7 @@
 
         <main>
             <!-- Left Column: Add Appointment & Calendar -->
-            <div class="space-y-8">
+            <div class="left-column" style="display: flex; flex-direction: column; gap: 2rem;">
                 <!-- Add Appointment Form -->
                 <div class="card">
                     <h2 class="card-title" data-i18n-key="setNewReminder">
@@ -337,12 +430,18 @@
                     <form id="appointmentForm">
                         <div>
                             <label for="patient_name" class="form-label" data-i18n-key="patientName">Patient Name</label>
-                            <input type="text" id="patient_name" name="patient_name" required class="form-input">
+                            <input type="text" id="patient_name" name="patient_name" required class="form-input" placeholder="Enter patient name">
                         </div>
+                        
+                        <!-- Doctor's Name Dropdown -->
                         <div>
                             <label for="doctor_name" class="form-label" data-i18n-key="doctorName">Doctor's Name</label>
-                            <input type="text" id="doctor_name" name="doctor_name" required class="form-input">
+                            <select id="doctor_name" name="doctor_name" required class="form-input">
+                                <option value="" data-i18n-key="selectDoctor">Select Doctor</option>
+                                <!-- Options populated by JS -->
+                            </select>
                         </div>
+
                         <div>
                             <label for="appointment_date" class="form-label" data-i18n-key="appointmentDate">Appointment Date</label>
                             <input type="date" id="appointment_date" name="appointment_date" required class="form-input">
@@ -388,7 +487,7 @@
             </div>
 
             <!-- Right Column: Widgets & Upcoming Appointments -->
-            <div class="space-y-8">
+            <div class="right-column" style="display: flex; flex-direction: column; gap: 2rem;">
                 <!-- Health Tip Widget -->
                 <div id="healthTipWidget" class="card widget">
                     <!-- Health tip will be injected here by script.js -->
@@ -399,20 +498,12 @@
                        <!-- Quote will be injected here -->
                 </div>
 
-                <div class="card">
+                <div class="card full-height">
                     <h2 class="card-title" data-i18n-key="upcomingAppointments">Upcoming Appointments</h2>
-                    <div id="appointmentList" class="space-y-4">
+                    <div id="appointmentList" class="space-y-4" style="display: flex; flex-direction: column; gap: 1rem;">
                         <!-- Appointments will be rendered here -->
-                        <div id="loadingState" class="text-center py-10 text-gray-500">
-                            <p data-i18n-key="loading">Loading appointments...</p>
-                        </div>
-                         <div id="emptyState" class="hidden text-center py-10 px-4 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <h3 class="mt-2 text-lg font-medium text-gray-900" data-i18n-key="noAppointments">No appointments scheduled</h3>
-                            <p class="mt-1 text-sm">Use the form on the left to add a new reminder.</p>
-                        </div>
+                        <div id="loadingState" class="text-center" style="padding: 2rem; color: #6b7280;" data-i18n-key="loading">Loading appointments...</div>
+                         <div id="emptyState" class="hidden text-center" style="padding: 2rem; color: #6b7280;" data-i18n-key="noAppointments">No appointments scheduled.</div>
                     </div>
                 </div>
             </div>
@@ -422,18 +513,24 @@
     <!-- Edit Appointment Modal -->
     <div id="editModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800" data-i18n-key="editAppointment">Edit Appointment</h2>
+            <h2 class="card-title" data-i18n-key="editAppointment" style="border:none; padding:0; margin-bottom: 1.5rem;">Edit Appointment</h2>
             <form id="editAppointmentForm">
                 <input type="hidden" id="edit_appointment_id" name="appointment_id">
-                <div class="space-y-4">
+                <div style="display: grid; gap: 1rem;">
                      <div>
                         <label for="edit_patient_name" class="form-label" data-i18n-key="patientName">Patient Name</label>
                         <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
                     </div>
+                    
+                    <!-- Edit form also uses a dropdown for Doctor's Name -->
                     <div>
                         <label for="edit_doctor_name" class="form-label" data-i18n-key="doctorName">Doctor's Name</label>
-                        <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
+                        <select id="edit_doctor_name" name="doctor_name" required class="form-input">
+                             <option value="" data-i18n-key="selectDoctor">Select Doctor</option>
+                             <!-- Options populated by JS -->
+                        </select>
                     </div>
+
                     <div>
                         <label for="edit_appointment_date" class="form-label" data-i18n-key="appointmentDate">Appointment Date</label>
                         <input type="date" id="edit_appointment_date" name="appointment_date" required class="form-input">
@@ -455,7 +552,7 @@
                         <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>
                     </div>
                 </div>
-                <div class="mt-8 flex justify-end space-x-4">
+                <div class="modal-actions">
                     <button type="button" id="cancelEdit" class="button-secondary" data-i18n-key="cancel">Cancel</button>
                     <button type="submit" class="button-primary" data-i18n-key="saveChanges">Save Changes</button>
                 </div>
