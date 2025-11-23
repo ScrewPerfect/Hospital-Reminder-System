@@ -10,19 +10,14 @@ header('Content-Type: application/json');
 require_once 'db_connect.php';
 
 // ==========================================================
-// FIX: Manually parse input if $_POST is empty (Common FormData issue)
+// FIX: Manually parse input if $_POST is empty (Necessary workaround for FormData streams)
 // ==========================================================
 if (empty($_POST) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Read the raw input stream
     $input = file_get_contents('php://input');
     
-    // Check if the input is URL-encoded (as sent by FormData)
-    if (strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false || 
-        strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false) {
-        
-        // Parse the input string and populate $_POST
-        parse_str($input, $_POST);
-    }
+    // Parse the input string and populate $_POST
+    parse_str($input, $_POST);
 }
 // ==========================================================
 // END FIX
@@ -37,10 +32,11 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-// Read parameters from $_POST array (which is now guaranteed to be populated if data was sent)
+// Read parameters from $_POST array (which is now guaranteed to be populated)
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
-if ($action === 'update_password') {
+// *** This check will now pass because $_POST['action'] is available ***
+if ($action === 'update_password') { 
     $newPassword = isset($_POST['new_password']) ? $_POST['new_password'] : '';
     $confirmPassword = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
@@ -75,7 +71,7 @@ if ($action === 'update_password') {
     }
 
 } else {
-    // This should now only catch requests that truly are missing the 'action' parameter (shouldn't happen)
+    // This final else block should no longer be reached
     echo json_encode(['success' => false, 'message' => 'Invalid action or request.']);
 }
 
