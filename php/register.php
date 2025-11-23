@@ -1,12 +1,14 @@
 <?php
-// 1. Include the database connection
+// File: register.php
+error_reporting(0);
+ini_set('display_errors', 0);
+
 require_once 'db_connect.php';
 
-// 2. Set the content type to JSON
 header('Content-Type: application/json');
 
-// 3. Get the input from the form (compatible with older PHP)
-$username = isset($_POST['username']) ? $_POST['username'] : '';
+// Get the input from the standard $_POST array (matches FormData)
+$username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
 
 // 4. Basic validation
@@ -27,7 +29,6 @@ $stmt_check->execute();
 $stmt_check->store_result();
 
 if ($stmt_check->num_rows > 0) {
-    // Username already exists
     echo json_encode(['success' => false, 'message' => 'Username already exists. Please choose another.']);
     $stmt_check->close();
     $conn->close();
@@ -48,15 +49,11 @@ if ($stmt_insert === false) {
 $stmt_insert->bind_param("ss", $username, $hashed_password);
 
 if ($stmt_insert->execute()) {
-    // Registration successful
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'message' => 'Registration successful!']);
 } else {
-    // Registration failed
     echo json_encode(['success' => false, 'message' => 'Registration failed. Please try again.']);
 }
 
-// 8. Close connections
 $stmt_insert->close();
 $conn->close();
 ?>
-
