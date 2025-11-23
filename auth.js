@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const formData = new FormData(loginForm);
             
-            // Send as FormData (matches $_POST in PHP)
+            // Sending as FormData (processed by $_POST in PHP)
             try {
                 const response = await fetch('php/login.php', {
                     method: 'POST',
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const formData = new FormData(registerForm);
 
-            // Send as FormData (matches $_POST in PHP)
+            // Sending as FormData (processed by $_POST in PHP)
             try {
                 const response = await fetch('php/register.php', {
                     method: 'POST',

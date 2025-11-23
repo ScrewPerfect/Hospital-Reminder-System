@@ -10,8 +10,9 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check if the connection was successful
 if ($conn->connect_error) {
-    // If it fails, stop the script and show an error
-    die("Connection failed: " . $conn->connect_error);
+    // FIX: Instead of die(), output a JSON error and exit
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Database connection failed. Check server status.']);
+    exit(); // Exit immediately
 }
 ?>
-

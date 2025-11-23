@@ -1,5 +1,6 @@
 <?php
 // File: register.php
+// Turn off error reporting to avoid breaking JSON response
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -7,7 +8,7 @@ require_once 'db_connect.php';
 
 header('Content-Type: application/json');
 
-// Get the input from the standard $_POST array (matches FormData)
+// --- FIX: Get the input directly from the standard $_POST array (matches FormData) ---
 $username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $password = isset($_POST['password']) ? $_POST['password'] : '';
 
