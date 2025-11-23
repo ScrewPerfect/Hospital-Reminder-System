@@ -433,13 +433,9 @@
                             <input type="text" id="patient_name" name="patient_name" required class="form-input" placeholder="Enter patient name">
                         </div>
                         
-                        <!-- Doctor's Name Dropdown -->
                         <div>
                             <label for="doctor_name" class="form-label" data-i18n-key="doctorName">Doctor's Name</label>
-                            <select id="doctor_name" name="doctor_name" required class="form-input">
-                                <option value="" data-i18n-key="selectDoctor">Select Doctor</option>
-                                <!-- Options populated by JS -->
-                            </select>
+                            <input type="text" id="doctor_name" name="doctor_name" required class="form-input" placeholder="Enter doctor's name">
                         </div>
 
                         <div>
@@ -522,23 +518,21 @@
                         <input type="text" id="edit_patient_name" name="patient_name" required class="form-input">
                     </div>
                     
-                    <!-- Edit form also uses a dropdown for Doctor's Name -->
-                    <div>
-                        <label for="edit_doctor_name" class="form-label" data-i18n-key="doctorName">Doctor's Name</label>
-                        <select id="edit_doctor_name" name="doctor_name" required class="form-input">
-                             <option value="" data-i18n-key="selectDoctor">Select Doctor</option>
-                             <!-- Options populated by JS -->
-                        </select>
+                
+                     <label for="edit_doctor_name" class="form-label" data-i18n-key="doctorName">Doctor's Name</label>
+                        <input type="text" id="edit_doctor_name" name="doctor_name" required class="form-input">
                     </div>
 
                     <div>
                         <label for="edit_appointment_date" class="form-label" data-i18n-key="appointmentDate">Appointment Date</label>
                         <input type="date" id="edit_appointment_date" name="appointment_date" required class="form-input">
                     </div>
+                    
                     <div>
                         <label for="edit_appointment_time" class="form-label" data-i18n-key="appointmentTime">Appointment Time</label>
                         <input type="time" id="edit_appointment_time" name="appointment_time" required class="form-input">
                     </div>
+                    
                     <div>
                         <label for="edit_status" class="form-label" data-i18n-key="status">Status</label>
                         <select id="edit_status" name="status" required class="form-input">
@@ -547,6 +541,7 @@
                             <option value="Canceled" data-i18n-key="canceled">Canceled</option>
                         </select>
                     </div>
+                    
                     <div>
                         <label for="edit_notes" class="form-label" data-i18n-key="notes">Notes / Reason for Visit</label>
                         <textarea id="edit_notes" name="notes" rows="3" class="form-input"></textarea>

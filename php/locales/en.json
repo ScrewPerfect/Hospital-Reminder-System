@@ -22,5 +22,7 @@
     "quoteTitle": "Quote of the Day",
     "editAppointment": "Edit Appointment",
     "saveChanges": "Save Changes",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "addNewDoctor": "Add New Doctor..."
+
 }

@@ -1,54 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if we are on the profile page before running any code
-    const updateEmailForm = document.getElementById('updateEmailForm');
-    if (!updateEmailForm) {
-        return; // Exit if not on the profile page
-    }
-
     const updatePasswordForm = document.getElementById('updatePasswordForm');
-    const emailInput = document.getElementById('email');
     const messageDiv = document.getElementById('message');
 
-    // Fetch user details to pre-fill the form
-    const fetchUserDetails = async () => {
-        try {
-            const response = await fetch('php/get_user_details.php');
-            const data = await response.json();
-            if (data.success && data.user && data.user.email) {
-                emailInput.value = data.user.email;
-            } else if (!data.success) {
-                // If the session is invalid or user not found, redirect to login
-                window.location.href = 'login.html';
-            }
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-        }
-    };
+    // Safety check: if the password form isn't found, stop the script to avoid errors.
+    if (!updatePasswordForm) {
+        return;
+    }
 
     const showMessage = (message, isSuccess) => {
         messageDiv.textContent = message;
-        messageDiv.className = isSuccess ? 'text-green-600 text-center text-sm font-medium h-5' : 'text-red-600 text-center text-sm font-medium h-5';
+        messageDiv.className = isSuccess ? 'text-center text-sm font-medium h-5 text-green-600' : 'text-center text-sm font-medium h-5 text-red-600';
         setTimeout(() => {
             messageDiv.textContent = '';
-        }, 3000); // Message disappears after 3 seconds
+        }, 3000); 
     };
 
-    updateEmailForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('php/update_profile.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'update_email', email: emailInput.value })
-            });
-            const result = await response.json();
-            showMessage(result.message, result.success);
-        } catch (error) {
-            console.error('Error updating email:', error);
-            showMessage('An error occurred. Please try again.', false);
-        }
-    });
-
+    // Handle Password Update
     updatePasswordForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const newPassword = document.getElementById('new_password').value;
@@ -59,15 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const formData = new FormData(updatePasswordForm);
+        formData.append('action', 'update_password'); // Tell PHP this is for password
+
         try {
             const response = await fetch('php/update_profile.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    action: 'update_password', 
-                    new_password: newPassword,
-                    confirm_password: confirmPassword // Sending confirmation for completeness
-                })
+                body: formData // Sending as FormData
             });
             const result = await response.json();
             showMessage(result.message, result.success);
@@ -75,12 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updatePasswordForm.reset();
             }
         } catch (error) {
-            console.error('Error updating password:', error);
             showMessage('An error occurred. Please try again.', false);
         }
     });
-
-    // Initial load
-    fetchUserDetails();
 });
-

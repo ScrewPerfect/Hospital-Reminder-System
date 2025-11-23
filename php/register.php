@@ -1,6 +1,4 @@
 <?php
-// File: register.php
-
 // 1. Include the database connection
 require_once 'db_connect.php';
 
