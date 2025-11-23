@@ -9,6 +9,26 @@ session_start();
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
+// ==========================================================
+// FIX: Manually parse input if $_POST is empty (Common FormData issue)
+// ==========================================================
+if (empty($_POST) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Read the raw input stream
+    $input = file_get_contents('php://input');
+    
+    // Check if the input is URL-encoded (as sent by FormData)
+    if (strpos($_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded') !== false || 
+        strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false) {
+        
+        // Parse the input string and populate $_POST
+        parse_str($input, $_POST);
+    }
+}
+// ==========================================================
+// END FIX
+// ==========================================================
+
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'User not logged in.']);
@@ -17,7 +37,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-// Read parameters from $_POST array (matches FormData from JavaScript)
+// Read parameters from $_POST array (which is now guaranteed to be populated if data was sent)
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
 if ($action === 'update_password') {
@@ -29,7 +49,7 @@ if ($action === 'update_password') {
         echo json_encode(['success' => false, 'message' => 'Password must be at least 3 characters long.']);
         exit();
     }
-    // Note: Frontend JS also performs this check, but it's good practice to have it here.
+    
     if ($newPassword !== $confirmPassword) {
         echo json_encode(['success' => false, 'message' => 'Passwords do not match.']);
         exit();
@@ -55,7 +75,7 @@ if ($action === 'update_password') {
     }
 
 } else {
-    // This catches requests that don't specify action=update_password
+    // This should now only catch requests that truly are missing the 'action' parameter (shouldn't happen)
     echo json_encode(['success' => false, 'message' => 'Invalid action or request.']);
 }
 
